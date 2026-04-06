@@ -15,6 +15,7 @@
     --success: #1a7a4a; --success-bg: #eaf5ee; --success-border: #a8d8bc;
     --danger: #b91c1c; --danger-bg: #fef2f2; --danger-border: #fca5a5;
     --warn: #8a5a00; --warn-bg: #fff8e6; --warn-border: #f0d68a;
+    --gdrive: #1a73e8; --gdrive-bg: #e8f0fe;
     --radius: 8px; --radius-lg: 12px;
     --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06);
     --font: 'IBM Plex Sans', system-ui, sans-serif;
@@ -26,7 +27,13 @@
   header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 0 2rem; display: flex; align-items: center; gap: 14px; height: 56px; position: sticky; top: 0; z-index: 10; }
   .logo { width: 32px; height: 32px; background: var(--accent); border-radius: 7px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
   header h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.01em; }
-  header p { font-size: 13px; color: var(--text3); margin-left: auto; }
+  .header-right { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+  .auth-status { font-size: 12px; display: flex; align-items: center; gap: 6px; }
+  .auth-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--border2); flex-shrink: 0; }
+  .auth-dot.connected { background: var(--success); }
+  .btn-auth { font-family: var(--font); font-size: 12px; font-weight: 500; padding: 6px 14px; border-radius: var(--radius); cursor: pointer; border: 1px solid var(--border2); background: var(--surface); color: var(--text2); display: flex; align-items: center; gap: 6px; transition: all 0.15s; white-space: nowrap; }
+  .btn-auth:hover { border-color: var(--gdrive); color: var(--gdrive); background: var(--gdrive-bg); }
+  .btn-auth.signed-in { border-color: var(--success-border); color: var(--success); background: var(--success-bg); }
 
   /* TABS */
   .tabs-bar { background: var(--surface); border-bottom: 1px solid var(--border); padding: 0 2rem; display: flex; position: sticky; top: 56px; z-index: 9; }
@@ -62,9 +69,25 @@
   .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
   .hidden { display: none !important; }
 
+  /* GOOGLE DRIVE AUTH BANNER */
+  .gdrive-banner { border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; margin-bottom: 0.875rem; }
+  .gdrive-banner-top { display: flex; align-items: center; gap: 10px; padding: 12px 14px; background: var(--gdrive-bg); border-bottom: 1px solid #c5d8f8; }
+  .gdrive-icon { width: 28px; height: 28px; flex-shrink: 0; }
+  .gdrive-banner-top h3 { font-size: 13px; font-weight: 600; color: #174ea6; }
+  .gdrive-banner-top p { font-size: 11px; color: #4285f4; margin-top: 1px; }
+  .gdrive-banner-body { padding: 12px 14px; background: var(--surface); }
+  .btn-gdrive { font-family: var(--font); font-size: 13px; font-weight: 500; padding: 9px 16px; border-radius: var(--radius); cursor: pointer; border: 1px solid #dadce0; background: var(--surface); color: #3c4043; display: flex; align-items: center; gap: 10px; transition: all 0.15s; width: 100%; justify-content: center; box-shadow: 0 1px 2px rgba(0,0,0,0.08); }
+  .btn-gdrive:hover { background: #f8f9fa; box-shadow: 0 2px 4px rgba(0,0,0,0.12); }
+  .btn-gdrive:active { background: #f1f3f4; }
+  .gdrive-connected { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--success); }
+  .gdrive-avatar { width: 28px; height: 28px; border-radius: 50%; background: var(--success-bg); border: 1px solid var(--success-border); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; color: var(--success); flex-shrink: 0; }
+  .btn-signout { font-family: var(--font); font-size: 11px; color: var(--text3); border: none; background: none; cursor: pointer; padding: 2px 6px; border-radius: 4px; margin-left: auto; }
+  .btn-signout:hover { background: var(--surface2); color: var(--danger); }
+
   /* DROP ZONE */
   .drop-zone { border: 2px dashed var(--border2); border-radius: var(--radius-lg); padding: 1.5rem 1rem; text-align: center; cursor: pointer; transition: all 0.2s; background: var(--surface2); position: relative; }
   .drop-zone:hover, .drop-zone.dragover { border-color: var(--accent); background: var(--accent-bg); }
+  .drop-zone.disabled { opacity: 0.5; pointer-events: none; }
   .drop-zone input[type=file] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; padding: 0; border: none; }
   .drop-zone-icon { width: 36px; height: 36px; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; display: flex; align-items: center; justify-content: center; margin: 0 auto 8px; }
   .drop-zone p { font-size: 13px; color: var(--text2); margin-bottom: 2px; font-weight: 500; }
@@ -77,6 +100,13 @@
   @keyframes spin { to { transform: rotate(360deg); } }
   .thumb-preview { margin-top: 10px; border-radius: var(--radius); overflow: hidden; border: 1px solid var(--border); max-height: 140px; display: flex; align-items: center; justify-content: center; background: var(--surface2); }
   .thumb-preview img { max-width: 100%; max-height: 140px; display: block; object-fit: contain; }
+
+  /* UPLOADED FILES LIST */
+  .uploaded-files { margin-top: 10px; display: flex; flex-direction: column; gap: 6px; }
+  .uploaded-file-item { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text2); background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 6px 10px; cursor: pointer; transition: border-color 0.15s; }
+  .uploaded-file-item:hover { border-color: var(--accent); color: var(--accent); }
+  .uploaded-file-item .fname { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .file-thumb { width: 32px; height: 32px; border-radius: 4px; object-fit: cover; border: 1px solid var(--border); flex-shrink: 0; }
 
   /* CARDS */
   .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow); }
@@ -107,11 +137,6 @@
   .steps { display: flex; flex-direction: column; gap: 6px; margin-top: 4px; }
   .step { display: flex; align-items: flex-start; gap: 10px; font-size: 13px; color: var(--text2); line-height: 1.5; }
   .step-num { width: 20px; height: 20px; border-radius: 50%; background: var(--accent); color: #fff; font-size: 11px; font-weight: 600; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
-  .config-panel { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px; margin-top: 6px; }
-  .uploaded-files { margin-top: 10px; display: flex; flex-direction: column; gap: 6px; }
-  .uploaded-file-item { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text2); background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 6px 10px; cursor: pointer; transition: border-color 0.15s; }
-  .uploaded-file-item:hover { border-color: var(--accent); color: var(--accent); }
-  .uploaded-file-item .fname { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
   /* TABLE BUILDER */
   .rubric-grid-wrap { overflow-x: auto; }
@@ -124,17 +149,12 @@
   .row-ctrl-cell { background: var(--surface2); border: 1px solid var(--border2); width: 28px; text-align: center; vertical-align: middle; }
   .col-ctrl-cell { background: var(--surface2); border: 1px solid var(--border2); text-align: center; padding: 3px; }
   .ctrl-btn { background: none; border: none; cursor: pointer; color: var(--text3); padding: 2px 5px; border-radius: 4px; font-size: 15px; line-height: 1; transition: all 0.12s; font-family: var(--font); }
-  .ctrl-btn:hover.del { color: var(--danger); background: var(--danger-bg); }
   .ctrl-btn.del:hover { color: var(--danger); background: var(--danger-bg); }
   .ctrl-btn.add { color: var(--accent); font-size: 17px; }
   .ctrl-btn.add:hover { background: var(--accent-bg); }
-
-  /* Style chips */
   .tbl-style-row { display: flex; gap: 7px; flex-wrap: wrap; margin-bottom: 1rem; }
   .style-chip { font-size: 12px; padding: 5px 12px; border-radius: 20px; border: 1px solid var(--border2); background: var(--surface); cursor: pointer; transition: all 0.15s; color: var(--text2); font-family: var(--font); }
   .style-chip.active { background: var(--accent); color: #fff; border-color: var(--accent); }
-
-  /* Table preview */
   .tbl-preview-wrap { overflow-x: auto; }
   .tbl-preview-wrap table { border-collapse: collapse; width: 100%; font-size: 14px; font-family: var(--font); }
   .tbl-preview-wrap td, .tbl-preview-wrap th { padding: 8px 12px; border: 1px solid #ccc; }
@@ -152,11 +172,14 @@
   @media (max-width: 860px) {
     .layout { grid-template-columns: 1fr; }
     .panel-left { position: static; max-height: none; border-right: none; border-bottom: 1px solid var(--border); }
-    header p { display: none; }
+    .header-right .auth-status span { display: none; }
   }
 </style>
 </head>
 <body>
+
+<!-- Google Identity Services -->
+<script src="https://accounts.google.com/gsi/client" async></script>
 
 <header>
   <div class="logo">
@@ -168,7 +191,16 @@
     </svg>
   </div>
   <h1>SEAS — Moodle Question HTML Builder</h1>
-  <p>Drag &amp; drop images · Auto-upload to GitHub · Generate Moodle HTML</p>
+  <div class="header-right">
+    <div class="auth-status">
+      <div class="auth-dot" id="headerDot"></div>
+      <span id="headerAuthLabel" style="font-size:12px;color:var(--text3);">Not signed in</span>
+    </div>
+    <button class="btn-auth" id="headerAuthBtn" onclick="handleAuthClick()">
+      <svg width="14" height="14" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+      Sign in with Google
+    </button>
+  </div>
 </header>
 
 <div class="tabs-bar">
@@ -204,6 +236,33 @@
         <span class="section-title">Image</span>
         <span class="badge">Optional</span>
       </div>
+
+      <!-- Google Drive auth banner -->
+      <div class="gdrive-banner" id="gdriveBanner">
+        <div class="gdrive-banner-top">
+          <svg class="gdrive-icon" viewBox="0 0 87.3 78" xmlns="http://www.w3.org/2000/svg">
+            <path d="m6.6 66.85 3.85 6.65c.8 1.4 1.95 2.5 3.3 3.3l13.75-23.8h-27.5c0 1.55.4 3.1 1.2 4.5z" fill="#0066da"/>
+            <path d="m43.65 25-13.75-23.8c-1.35.8-2.5 1.9-3.3 3.3l-25.4 44a9.06 9.06 0 0 0 -1.2 4.5h27.5z" fill="#00ac47"/>
+            <path d="m73.55 76.8c1.35-.8 2.5-1.9 3.3-3.3l1.6-2.75 7.65-13.25c.8-1.4 1.2-2.95 1.2-4.5h-27.502l5.852 11.5z" fill="#ea4335"/>
+            <path d="m43.65 25 13.75-23.8c-1.35-.8-2.9-1.2-4.5-1.2h-18.5c-1.6 0-3.15.45-4.5 1.2z" fill="#00832d"/>
+            <path d="m59.8 53h-32.3l-13.75 23.8c1.35.8 2.9 1.2 4.5 1.2h50.8c1.6 0 3.15-.45 4.5-1.2z" fill="#2684fc"/>
+            <path d="m73.4 26.5-12.7-22c-.8-1.4-1.95-2.5-3.3-3.3l-13.75 23.8 16.15 27h27.45c0-1.55-.4-3.1-1.2-4.5z" fill="#ffba00"/>
+          </svg>
+          <div>
+            <h3>Google Drive image upload</h3>
+            <p id="gdriveSubtitle">Sign in to upload images directly to your shared folder</p>
+          </div>
+        </div>
+        <div class="gdrive-banner-body" id="gdriveBannerBody">
+          <button class="btn-gdrive" id="gdriveSigninBtn" onclick="signInWithGoogle()">
+            <svg width="18" height="18" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+            Sign in with Google
+          </button>
+          <p class="hint" style="margin-top:8px;text-align:center;">You'll be asked to allow access to Google Drive. Images go directly to the shared SEAS folder.</p>
+        </div>
+      </div>
+
+      <!-- Drop zone — disabled until signed in -->
       <div class="drop-zone" id="dropZone">
         <input type="file" id="fileInput" accept="image/*" />
         <div class="drop-zone-icon">
@@ -212,17 +271,15 @@
             <path d="M3 13v1a1 1 0 001 1h10a1 1 0 001-1v-1" stroke="#5a5850" stroke-width="1.5" stroke-linecap="round"/>
           </svg>
         </div>
-        <p>Drag &amp; drop an image here</p>
-        <span>or click to browse — JPG, PNG, GIF, WebP</span>
+        <p id="dropZoneLabel">Sign in with Google first to enable upload</p>
+        <span>JPG, PNG, GIF, WebP supported</span>
       </div>
+
       <div id="thumbPreview" class="thumb-preview hidden"></div>
       <div id="uploadStatus" class="hidden"></div>
       <div class="uploaded-files" id="uploadedFiles"></div>
+
       <div class="field" style="margin-top:10px;">
-        <label for="imgurl">Image URL <span style="font-weight:400;color:var(--text3);">— auto-filled after upload, or paste manually</span></label>
-        <input type="text" id="imgurl" placeholder="https://raw.githubusercontent.com/..." />
-      </div>
-      <div class="field">
         <label for="imgalt">Alt text (describe the image)</label>
         <input type="text" id="imgalt" placeholder="e.g. Diagram showing cell division stages" />
       </div>
@@ -255,8 +312,8 @@
         </div>
       </div>
       <div class="field hidden" id="customWidthWrap">
-        <label for="customWidth">Custom width (e.g. 350px or 70%)</label>
-        <input type="text" id="customWidth" placeholder="350px" />
+        <label for="customWidth">Custom width</label>
+        <input type="text" id="customWidth" placeholder="e.g. 350px or 70%" />
       </div>
     </div>
 
@@ -268,18 +325,7 @@
       </div>
       <div class="field">
         <label for="extratext">Text below image</label>
-        <textarea id="extratext" placeholder="e.g. Figure 1. Cross-section of a plant cell (×400)" style="min-height:64px;"></textarea>
-      </div>
-    </div>
-
-    <div class="section" style="display:none;">
-      <div class="config-panel" id="configPanel">
-        <div class="field"><label for="cfgUser">GitHub username</label><input type="text" id="cfgUser" /></div>
-        <div class="field"><label for="cfgRepo">Repository name</label><input type="text" id="cfgRepo" /></div>
-        <div class="field"><label for="cfgToken">Token</label><input type="text" id="cfgToken" /></div>
-        <div class="field"><label for="cfgFolder">Folder</label><input type="text" id="cfgFolder" /></div>
-        <button class="btn btn-primary" onclick="saveConfig()">Save</button>
-        <div id="configSaved" class="hidden" style="margin-top:8px;font-size:12px;color:var(--success);">✓ Saved</div>
+        <textarea id="extratext" placeholder="e.g. Figure 1. Cross-section of a plant cell (×400)&#10;Note: All measurements are in micrometres (µm)." style="min-height:64px;"></textarea>
       </div>
     </div>
 
@@ -289,10 +335,10 @@
         <span class="section-title">How to use</span>
       </div>
       <div class="steps">
-        <div class="step"><div class="step-num">1</div><span>Type your question text above</span></div>
-        <div class="step"><div class="step-num">2</div><span>Drag &amp; drop an image — it uploads to GitHub automatically</span></div>
-        <div class="step"><div class="step-num">3</div><span>Adjust size, alignment, and add a caption if needed</span></div>
-        <div class="step"><div class="step-num">4</div><span>Click <strong>Copy HTML</strong> and paste into Moodle question source view (<strong>&lt;&gt;</strong>)</span></div>
+        <div class="step"><div class="step-num">1</div><span>Click <strong>Sign in with Google</strong> above — one-time setup</span></div>
+        <div class="step"><div class="step-num">2</div><span>Type your question text</span></div>
+        <div class="step"><div class="step-num">3</div><span>Drag &amp; drop an image — it uploads automatically to the shared Google Drive folder</span></div>
+        <div class="step"><div class="step-num">4</div><span>Click <strong>Copy HTML</strong> and paste into Moodle → question editor → Source view (<strong>&lt;&gt;</strong>)</span></div>
       </div>
     </div>
 
@@ -334,12 +380,10 @@
 </div>
 </div>
 
-<!-- ══════════════════════ TAB: TABLE / RUBRIC BUILDER ══════════════════════ -->
+<!-- ══════════════════════ TAB: TABLE BUILDER ══════════════════════ -->
 <div id="tab-table" class="tab-pane">
 <div class="layout">
-
   <div class="panel-left">
-
     <div class="section">
       <div class="section-header">
         <div class="section-icon"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1" y="1" width="12" height="12" rx="2" stroke="#5a5850" stroke-width="1.5"/><path d="M1 5h12M5 5v7" stroke="#5a5850" stroke-width="1.3"/></svg></div>
@@ -364,34 +408,20 @@
         </button>
       </div>
     </div>
-
     <div class="section">
       <div class="section-header">
         <div class="section-icon"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 3h10M2 7h10M2 11h10M5 1v12M9 1v12" stroke="#5a5850" stroke-width="1.3"/></svg></div>
         <span class="section-title">Table Size</span>
       </div>
       <div class="grid-2 field">
-        <div>
-          <label for="tblRows">Rows (excl. header)</label>
-          <input type="number" id="tblRows" value="4" min="1" max="20" onchange="rebuildTable()" />
-        </div>
-        <div>
-          <label for="tblCols">Columns</label>
-          <input type="number" id="tblCols" value="5" min="1" max="12" onchange="rebuildTable()" />
-        </div>
+        <div><label for="tblRows">Rows (excl. header)</label><input type="number" id="tblRows" value="4" min="1" max="20" onchange="rebuildTable()" /></div>
+        <div><label for="tblCols">Columns</label><input type="number" id="tblCols" value="5" min="1" max="12" onchange="rebuildTable()" /></div>
       </div>
       <div class="field" style="display:flex;flex-direction:column;gap:8px;">
-        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin-bottom:0;">
-          <input type="checkbox" id="hasHeader" checked onchange="renderEditor();updateTableOutput()" style="width:auto;" />
-          First row is a header row
-        </label>
-        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin-bottom:0;">
-          <input type="checkbox" id="hasFirstColHeader" onchange="renderEditor();updateTableOutput()" style="width:auto;" />
-          First column is also a header
-        </label>
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin-bottom:0;"><input type="checkbox" id="hasHeader" checked onchange="renderEditor();updateTableOutput()" style="width:auto;" /> First row is a header row</label>
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin-bottom:0;"><input type="checkbox" id="hasFirstColHeader" onchange="renderEditor();updateTableOutput()" style="width:auto;" /> First column is also a header</label>
       </div>
     </div>
-
     <div class="section">
       <div class="section-header">
         <div class="section-icon"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="4" cy="7" r="2.2" fill="#5a5850"/><circle cx="10" cy="7" r="2.2" fill="#5a5850" opacity=".4"/><circle cx="7" cy="4" r="2.2" fill="#5a5850" opacity=".2"/></svg></div>
@@ -405,7 +435,6 @@
         <button class="style-chip"        data-style="plain"    onclick="setStyle('plain',this)">Plain</button>
       </div>
     </div>
-
     <div class="section">
       <div class="section-header">
         <div class="section-icon"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5.5" stroke="#5a5850" stroke-width="1.5"/><path d="M7 5v2.5l1.5 1.5" stroke="#5a5850" stroke-width="1.5" stroke-linecap="round"/></svg></div>
@@ -414,42 +443,23 @@
       <div class="steps">
         <div class="step"><div class="step-num">1</div><span>Pick a quick-start template, or set rows &amp; columns manually</span></div>
         <div class="step"><div class="step-num">2</div><span>Click any cell and type your content directly in the grid</span></div>
-        <div class="step"><div class="step-num">3</div><span>Use <strong>+</strong> buttons to add rows/columns, <strong>×</strong> to remove them</span></div>
+        <div class="step"><div class="step-num">3</div><span>Use <strong>+</strong> to add rows/columns, <strong>×</strong> to remove them</span></div>
         <div class="step"><div class="step-num">4</div><span>Pick a style, then click <strong>Copy HTML</strong> and paste into Moodle</span></div>
       </div>
     </div>
-
   </div>
 
   <div class="panel-right">
-
     <div class="card">
-      <div class="card-header">
-        <span class="card-header-title">Table Editor</span>
-        <span style="font-size:12px;color:var(--text3);">Click any cell to edit · + to add · × to remove</span>
-      </div>
-      <div class="card-body" style="padding:0.75rem;">
-        <div class="rubric-grid-wrap" id="tableEditorWrap"></div>
-      </div>
+      <div class="card-header"><span class="card-header-title">Table Editor</span><span style="font-size:12px;color:var(--text3);">Click any cell to edit · + to add · × to remove</span></div>
+      <div class="card-body" style="padding:0.75rem;"><div class="rubric-grid-wrap" id="tableEditorWrap"></div></div>
     </div>
-
     <div class="card">
-      <div class="card-header">
-        <span class="card-header-title">Live Preview</span>
-        <span style="font-size:12px;color:var(--text3);">How it will look in Moodle</span>
-      </div>
-      <div class="card-body">
-        <div class="tbl-preview-wrap style-striped" id="tblPreviewWrap">
-          <span class="empty-state">Your table preview will appear here.</span>
-        </div>
-      </div>
+      <div class="card-header"><span class="card-header-title">Live Preview</span><span style="font-size:12px;color:var(--text3);">How it will look in Moodle</span></div>
+      <div class="card-body"><div class="tbl-preview-wrap style-striped" id="tblPreviewWrap"><span class="empty-state">Your table preview will appear here.</span></div></div>
     </div>
-
     <div class="card">
-      <div class="card-header">
-        <span class="card-header-title">Generated HTML</span>
-        <span style="font-size:12px;color:var(--text3);">Paste into Moodle → question editor → Source view (&lt;&gt;)</span>
-      </div>
+      <div class="card-header"><span class="card-header-title">Generated HTML</span><span style="font-size:12px;color:var(--text3);">Paste into Moodle → question editor → Source view (&lt;&gt;)</span></div>
       <div class="card-body">
         <div class="code-block" id="tblCodebox"></div>
         <div class="btn-row">
@@ -461,13 +471,333 @@
         </div>
       </div>
     </div>
-
   </div>
 </div>
 </div>
 
 <script>
-/* ═══ SHARED ═══ */
+/* ══════════════════════════════════════════════════
+   CONFIGURATION — set your Google Drive folder ID here
+   ══════════════════════════════════════════════════ */
+const GDRIVE_FOLDER_ID = '1cldAWxYSQ3Ft6TDmIVCpjwxTqHWq0WY7';
+
+// IMPORTANT: Replace this with your own OAuth Client ID from Google Cloud Console
+// Steps: console.cloud.google.com → Create project → Enable Drive API
+//        → Credentials → Create OAuth 2.0 Client ID → Web application
+//        → Add your GitHub Pages URL as an Authorized JavaScript origin
+const GOOGLE_CLIENT_ID = 'YOUR_GOOGLE_CLIENT_ID_HERE';
+
+/* ══════════════════════════════════════════════════
+   GOOGLE AUTH STATE
+   ══════════════════════════════════════════════════ */
+let gAccessToken = null;
+let gUserName = '';
+let gUserInitials = '';
+
+function handleAuthClick() {
+  if (gAccessToken) { signOut(); } else { signInWithGoogle(); }
+}
+
+function signInWithGoogle() {
+  if (!window.google) {
+    showStatus('error', 'Google Sign-In is loading, please wait a moment and try again.');
+    return;
+  }
+  const client = google.accounts.oauth2.initTokenClient({
+    client_id: GOOGLE_CLIENT_ID,
+    scope: 'https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/userinfo.profile',
+    callback: async (resp) => {
+      if (resp.error) { showStatus('error', 'Sign-in failed: ' + resp.error); return; }
+      gAccessToken = resp.access_token;
+      // Fetch user profile
+      try {
+        const r = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+          headers: { Authorization: 'Bearer ' + gAccessToken }
+        });
+        const user = await r.json();
+        gUserName = user.name || user.email || 'Signed in';
+        gUserInitials = (user.given_name || gUserName).charAt(0).toUpperCase();
+      } catch(e) { gUserName = 'Signed in'; gUserInitials = 'G'; }
+      updateAuthUI(true);
+    }
+  });
+  client.requestAccessToken();
+}
+
+function signOut() {
+  gAccessToken = null;
+  gUserName = '';
+  gUserInitials = '';
+  if (window.google && window.google.accounts && window.google.accounts.oauth2) {
+    google.accounts.oauth2.revoke(gAccessToken);
+  }
+  updateAuthUI(false);
+}
+
+function updateAuthUI(signedIn) {
+  const dot   = document.getElementById('headerDot');
+  const label = document.getElementById('headerAuthLabel');
+  const btn   = document.getElementById('headerAuthBtn');
+  const dropZone = document.getElementById('dropZone');
+  const dropLabel = document.getElementById('dropZoneLabel');
+  const bannerBody = document.getElementById('gdriveBannerBody');
+  const subtitle   = document.getElementById('gdriveSubtitle');
+
+  if (signedIn) {
+    dot.classList.add('connected');
+    label.textContent = gUserName;
+    label.style.color = 'var(--success)';
+    btn.classList.add('signed-in');
+    btn.innerHTML = `<svg width="7" height="7" viewBox="0 0 7 7"><circle cx="3.5" cy="3.5" r="3.5" fill="var(--success)"/></svg> ${gUserName} — Sign out`;
+
+    dropZone.classList.remove('disabled');
+    dropLabel.textContent = 'Drag & drop an image here';
+
+    subtitle.textContent = 'Connected — images upload directly to the SEAS folder';
+    bannerBody.innerHTML = `
+      <div class="gdrive-connected">
+        <div class="gdrive-avatar">${gUserInitials}</div>
+        <div>
+          <div style="font-weight:600;font-size:13px;">${gUserName}</div>
+          <div style="font-size:11px;color:var(--text3);">Uploads go to: SEAS Question Images folder</div>
+        </div>
+        <button class="btn-signout" onclick="signOut()">Sign out</button>
+      </div>`;
+  } else {
+    dot.classList.remove('connected');
+    label.textContent = 'Not signed in';
+    label.style.color = 'var(--text3)';
+    btn.classList.remove('signed-in');
+    btn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg> Sign in with Google`;
+
+    dropZone.classList.add('disabled');
+    dropLabel.textContent = 'Sign in with Google first to enable upload';
+    bannerBody.innerHTML = `
+      <button class="btn-gdrive" id="gdriveSigninBtn" onclick="signInWithGoogle()">
+        <svg width="18" height="18" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+        Sign in with Google
+      </button>
+      <p class="hint" style="margin-top:8px;text-align:center;">You'll be asked to allow access to Google Drive.</p>`;
+    subtitle.textContent = 'Sign in to upload images directly to your shared folder';
+  }
+}
+
+/* ══════════════════════════════════════════════════
+   GOOGLE DRIVE UPLOAD
+   ══════════════════════════════════════════════════ */
+async function uploadToDrive(file) {
+  if (!gAccessToken) { showStatus('error','Please sign in with Google first.'); return null; }
+
+  showStatus('uploading', `Uploading "${file.name}" to Google Drive…`);
+
+  // Step 1: Upload file content via multipart upload
+  const metadata = {
+    name: `${Date.now()}_${file.name}`,
+    parents: [GDRIVE_FOLDER_ID]
+  };
+
+  const form = new FormData();
+  form.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' }));
+  form.append('file', file);
+
+  try {
+    const uploadRes = await fetch(
+      'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id,name',
+      {
+        method: 'POST',
+        headers: { Authorization: 'Bearer ' + gAccessToken },
+        body: form
+      }
+    );
+
+    if (!uploadRes.ok) {
+      const err = await uploadRes.json().catch(() => ({}));
+      showStatus('error', `Upload failed (${uploadRes.status}): ${err.error?.message || uploadRes.statusText}`);
+      return null;
+    }
+
+    const fileData = await uploadRes.json();
+    const fileId = fileData.id;
+
+    // Step 2: Make it publicly readable so Moodle can show it
+    await fetch(`https://www.googleapis.com/drive/v3/files/${fileId}/permissions`, {
+      method: 'POST',
+      headers: {
+        Authorization: 'Bearer ' + gAccessToken,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ role: 'reader', type: 'anyone' })
+    });
+
+    // Step 3: Return the thumbnail URL (confirmed to work in Moodle)
+    const thumbnailUrl = `https://drive.google.com/thumbnail?id=${fileId}&sz=w1600`;
+    showStatus('success', `"${file.name}" uploaded successfully!`);
+    return { fileId, thumbnailUrl, name: fileData.name };
+
+  } catch (e) {
+    showStatus('error', `Network error: ${e.message}`);
+    return null;
+  }
+}
+
+/* ══════════════════════════════════════════════════
+   DRAG & DROP
+   ══════════════════════════════════════════════════ */
+const dropZone = document.getElementById('dropZone');
+const fileInput = document.getElementById('fileInput');
+
+dropZone.addEventListener('dragover', e => { e.preventDefault(); if (!dropZone.classList.contains('disabled')) dropZone.classList.add('dragover'); });
+dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+dropZone.addEventListener('drop', e => {
+  e.preventDefault(); dropZone.classList.remove('dragover');
+  if (dropZone.classList.contains('disabled')) return;
+  const f = e.dataTransfer.files[0];
+  if (f && f.type.startsWith('image/')) handleFile(f);
+  else if (f) showStatus('error', 'Please drop an image file (JPG, PNG, GIF, WebP).');
+});
+fileInput.addEventListener('change', () => { if (fileInput.files[0]) handleFile(fileInput.files[0]); });
+
+async function handleFile(file) {
+  // Show local thumbnail immediately
+  const localUrl = URL.createObjectURL(file);
+  const thumb = document.getElementById('thumbPreview');
+  thumb.innerHTML = `<img src="${localUrl}" alt="preview" />`;
+  thumb.classList.remove('hidden');
+
+  const result = await uploadToDrive(file);
+  if (result) {
+    // Auto-fill the current image URL state used for HTML generation
+    currentImageUrl = result.thumbnailUrl;
+    if (!document.getElementById('imgalt').value.trim()) {
+      document.getElementById('imgalt').value = file.name.replace(/\.[^.]+$/, '').replace(/[_-]+/g, ' ');
+    }
+    addUploadedChip(file.name, result.thumbnailUrl, localUrl);
+    update();
+  }
+}
+
+function addUploadedChip(name, url, thumbSrc) {
+  const container = document.getElementById('uploadedFiles');
+  const item = document.createElement('div');
+  item.className = 'uploaded-file-item';
+  item.title = 'Click to use this image';
+  const imgTag = thumbSrc ? `<img class="file-thumb" src="${thumbSrc}" alt="" />` :
+    `<svg width="13" height="13" viewBox="0 0 13 13" fill="none"><rect x="0.5" y="0.5" width="12" height="12" rx="2" stroke="currentColor" stroke-width="1.1"/><circle cx="4.5" cy="4.5" r="1.2" fill="currentColor"/><path d="M1 10l3-3 2.5 2.5L9 7l3.5 3.5" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+  item.innerHTML = `${imgTag}<span class="fname">${name}</span><svg width="11" height="11" viewBox="0 0 11 11" fill="none"><path d="M2 5.5h7M6.5 3l2.5 2.5L6.5 8" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+  item.addEventListener('click', () => { currentImageUrl = url; update(); });
+  container.prepend(item);
+}
+
+function showStatus(type, msg) {
+  const el = document.getElementById('uploadStatus');
+  el.className = `upload-status ${type}`; el.classList.remove('hidden');
+  const icons = {
+    uploading: `<div class="spinner"></div>`,
+    success: `<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" fill="#eaf5ee" stroke="#a8d8bc" stroke-width="1.2"/><path d="M5 8l2.5 2.5L11 6" stroke="#1a7a4a" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+    error: `<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" fill="#fef2f2" stroke="#fca5a5" stroke-width="1.2"/><path d="M6 6l4 4M10 6l-4 4" stroke="#b91c1c" stroke-width="1.5" stroke-linecap="round"/></svg>`
+  };
+  el.innerHTML = `${icons[type] || ''}<span>${msg}</span>`;
+}
+
+/* ══════════════════════════════════════════════════
+   HTML GENERATION
+   ══════════════════════════════════════════════════ */
+let currentImageUrl = '';
+
+function esc(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function getWidth() { const v = document.getElementById('imgwidth').value; return v === 'custom' ? (document.getElementById('customWidth').value.trim() || '400px') : v; }
+
+function buildHTML() {
+  const qtext  = document.getElementById('qtext').value.trim();
+  const imgalt = document.getElementById('imgalt').value.trim() || 'Question image';
+  const align  = document.getElementById('imgalign').value;
+  const border = document.getElementById('imgborder').value;
+  const width  = getWidth();
+  const extra  = document.getElementById('extratext').value.trim();
+
+  let html = '';
+  if (qtext) qtext.split('\n').forEach(l => { if (l.trim()) html += `<p>${esc(l)}</p>\n`; });
+
+  if (currentImageUrl) {
+    let imgStyle = `max-width: ${width}; height: auto; display: block;`;
+    if (border !== 'none') imgStyle += ` border: ${border};`;
+    let wrapStyle = 'margin: 12px 0;';
+    if (align === 'center') { wrapStyle += ' text-align: center;'; imgStyle += ' margin-left: auto; margin-right: auto;'; }
+    else if (align === 'right') { wrapStyle += ' text-align: right;'; imgStyle += ' margin-left: auto;'; }
+    html += `<div style="${wrapStyle}">\n  <img src="${esc(currentImageUrl)}" alt="${esc(imgalt)}" style="${imgStyle}" />\n</div>\n`;
+  }
+
+  if (extra) extra.split('\n').forEach(l => { if (l.trim()) html += `<p style="font-size: 0.9em; color: #555555; margin-top: 4px;">${esc(l)}</p>\n`; });
+  return html.trim();
+}
+
+function update() {
+  const html = buildHTML();
+  const preview = document.getElementById('preview');
+  const codebox = document.getElementById('codebox');
+  const emptyNotice = document.getElementById('emptyNotice');
+  const codeWrap = document.getElementById('codeWrap');
+
+  if (!html) {
+    preview.innerHTML = '<span class="empty-state">Fill in the fields to see a preview here.</span>';
+    emptyNotice.classList.remove('hidden'); codeWrap.classList.add('hidden'); return;
+  }
+  emptyNotice.classList.add('hidden'); codeWrap.classList.remove('hidden');
+  codebox.textContent = html;
+
+  const qtext  = document.getElementById('qtext').value.trim();
+  const imgalt = document.getElementById('imgalt').value.trim() || 'Question image';
+  const align  = document.getElementById('imgalign').value;
+  const border = document.getElementById('imgborder').value;
+  const width  = getWidth();
+  const extra  = document.getElementById('extratext').value.trim();
+
+  let pv = '';
+  if (qtext) qtext.split('\n').forEach(l => { if (l.trim()) pv += `<p style="margin-bottom:6px;">${l}</p>`; });
+  if (currentImageUrl) {
+    let is = `max-width:${width}; height:auto; display:block;`;
+    if (border !== 'none') is += ` border:${border};`;
+    let cls = 'img-left';
+    if (align === 'center') { cls = 'img-center'; is += ' margin-left:auto; margin-right:auto;'; }
+    else if (align === 'right') { cls = 'img-right'; is += ' margin-left:auto;'; }
+    pv += `<div class="${cls}"><img src="${currentImageUrl}" alt="${imgalt}" style="${is}" /></div>`;
+  }
+  if (extra) extra.split('\n').forEach(l => { if (l.trim()) pv += `<p style="font-size:0.9em;color:#666;margin-top:4px;">${l}</p>`; });
+  preview.innerHTML = pv;
+}
+
+function copyCode() {
+  const code = document.getElementById('codebox').textContent; if (!code) return;
+  const btn = document.getElementById('copybtn');
+  const ok = () => {
+    btn.classList.replace('btn-primary','btn-success');
+    btn.innerHTML = `<svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M2 6.5l3.5 3.5 5.5-6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg> Copied!`;
+    setTimeout(() => { btn.classList.replace('btn-success','btn-primary'); btn.innerHTML = `<svg width="13" height="13" viewBox="0 0 13 13" fill="none"><rect x="3.5" y="0.5" width="9" height="9" rx="1.5" stroke="white" stroke-width="1.2"/><rect x="0.5" y="3.5" width="9" height="9" rx="1.5" fill="#1a4fd8" stroke="white" stroke-width="1.2"/></svg> Copy HTML`; }, 2500);
+  };
+  navigator.clipboard.writeText(code).then(ok).catch(() => { const ta = document.createElement('textarea'); ta.value = code; ta.style.cssText = 'position:fixed;opacity:0;'; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta); ok(); });
+}
+
+function resetAll() {
+  ['qtext','imgalt','extratext'].forEach(id => document.getElementById(id).value = '');
+  currentImageUrl = '';
+  document.getElementById('imgwidth').value = '400px';
+  document.getElementById('imgalign').value = 'center';
+  document.getElementById('imgborder').value = 'none';
+  document.getElementById('customWidth').value = '';
+  document.getElementById('customWidthWrap').classList.add('hidden');
+  document.getElementById('thumbPreview').classList.add('hidden');
+  document.getElementById('uploadStatus').classList.add('hidden');
+  document.getElementById('uploadedFiles').innerHTML = '';
+  update();
+}
+
+['qtext','imgalt','extratext','customWidth'].forEach(id => document.getElementById(id).addEventListener('input', update));
+['imgwidth','imgalign','imgborder'].forEach(id => document.getElementById(id).addEventListener('change', update));
+document.getElementById('imgwidth').addEventListener('change', function() { document.getElementById('customWidthWrap').classList.toggle('hidden', this.value !== 'custom'); });
+
+/* ══════════════════════════════════════════════════
+   SHARED
+   ══════════════════════════════════════════════════ */
 function switchTab(name, btn) {
   document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -475,291 +805,71 @@ function switchTab(name, btn) {
   btn.classList.add('active');
 }
 
-/* ═══ QUESTION BUILDER ═══ */
-const DEFAULTS = {
-  user: 'mcbulan22',
-  repo: 'maa-seas-question-images',
-  token: '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',
-  folder: 'images'
-};
-function getCfg() { return { ...DEFAULTS }; }
-function saveConfig() {
-  const msg = document.getElementById('configSaved');
-  msg.classList.remove('hidden');
-  setTimeout(() => msg.classList.add('hidden'), 2500);
-}
+// Initialize drop zone as disabled
+dropZone.classList.add('disabled');
+updateAuthUI(false);
 
-async function uploadToGitHub(file) {
-  const cfg = getCfg();
-  if (!cfg.token) { showStatus('error','No GitHub token configured.'); return null; }
-  const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g,'_');
-  const fname    = `${Date.now()}_${safeName}`;
-  const path     = cfg.folder ? `${cfg.folder.replace(/\/$/,'')}/${fname}` : fname;
-  const apiUrl   = `https://api.github.com/repos/${cfg.user}/${cfg.repo}/contents/${path}`;
-  showStatus('uploading',`Uploading ${file.name}…`);
-  try {
-    const base64 = await toBase64(file);
-    const res = await fetch(apiUrl,{
-      method:'PUT',
-      headers:{'Authorization':`Bearer ${cfg.token}`,'Content-Type':'application/json','Accept':'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28'},
-      body:JSON.stringify({message:`Upload ${fname} via SEAS Question Builder`,content:base64})
-    });
-    if (!res.ok) { const e=await res.json().catch(()=>({})); showStatus('error',`Upload failed (${res.status}): ${e.message||res.statusText}`); return null; }
-    const data = await res.json();
-    showStatus('success',`"${file.name}" uploaded successfully!`);
-    return data.content.download_url;
-  } catch(e) { showStatus('error',`Network error: ${e.message}`); return null; }
-}
-function toBase64(file) {
-  return new Promise((res,rej) => { const r=new FileReader(); r.onload=()=>res(r.result.split(',')[1]); r.onerror=rej; r.readAsDataURL(file); });
-}
-function showStatus(type,msg) {
-  const el=document.getElementById('uploadStatus'); el.className=`upload-status ${type}`; el.classList.remove('hidden');
-  const icons={uploading:`<div class="spinner"></div>`,success:`<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" fill="#eaf5ee" stroke="#a8d8bc" stroke-width="1.2"/><path d="M5 8l2.5 2.5L11 6" stroke="#1a7a4a" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`,error:`<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" fill="#fef2f2" stroke="#fca5a5" stroke-width="1.2"/><path d="M6 6l4 4M10 6l-4 4" stroke="#b91c1c" stroke-width="1.5" stroke-linecap="round"/></svg>`};
-  el.innerHTML=`${icons[type]||''}<span>${msg}</span>`;
-}
-const dropZone=document.getElementById('dropZone'), fileInput=document.getElementById('fileInput');
-dropZone.addEventListener('dragover',e=>{e.preventDefault();dropZone.classList.add('dragover');});
-dropZone.addEventListener('dragleave',()=>dropZone.classList.remove('dragover'));
-dropZone.addEventListener('drop',e=>{e.preventDefault();dropZone.classList.remove('dragover');const f=e.dataTransfer.files[0];if(f&&f.type.startsWith('image/'))handleFile(f);else if(f)showStatus('error','Please drop an image file.');});
-fileInput.addEventListener('change',()=>{if(fileInput.files[0])handleFile(fileInput.files[0]);});
-async function handleFile(file) {
-  const localUrl=URL.createObjectURL(file);
-  const thumb=document.getElementById('thumbPreview'); thumb.innerHTML=`<img src="${localUrl}" alt="preview" />`; thumb.classList.remove('hidden');
-  const rawUrl=await uploadToGitHub(file);
-  if(rawUrl){
-    document.getElementById('imgurl').value=rawUrl;
-    if(!document.getElementById('imgalt').value.trim()) document.getElementById('imgalt').value=file.name.replace(/\.[^.]+$/,'').replace(/[_-]+/g,' ');
-    addUploadedChip(file.name,rawUrl); update();
-  }
-}
-function addUploadedChip(name,url) {
-  const c=document.getElementById('uploadedFiles'),item=document.createElement('div');
-  item.className='uploaded-file-item'; item.title='Click to use this image';
-  item.innerHTML=`<svg width="13" height="13" viewBox="0 0 13 13" fill="none"><rect x="0.5" y="0.5" width="12" height="12" rx="2" stroke="currentColor" stroke-width="1.1"/><circle cx="4.5" cy="4.5" r="1.2" fill="currentColor"/><path d="M1 10l3-3 2.5 2.5L9 7l3.5 3.5" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="fname">${name}</span><svg width="11" height="11" viewBox="0 0 11 11" fill="none"><path d="M2 5.5h7M6.5 3l2.5 2.5L6.5 8" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
-  item.addEventListener('click',()=>{document.getElementById('imgurl').value=url;update();});
-  c.prepend(item);
-}
-function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
-function getWidth(){const v=document.getElementById('imgwidth').value;return v==='custom'?(document.getElementById('customWidth').value.trim()||'400px'):v;}
-function buildHTML(){
-  const qtext=document.getElementById('qtext').value.trim(),imgurl=document.getElementById('imgurl').value.trim(),imgalt=document.getElementById('imgalt').value.trim()||'Question image',align=document.getElementById('imgalign').value,border=document.getElementById('imgborder').value,width=getWidth(),extra=document.getElementById('extratext').value.trim();
-  let html='';
-  if(qtext)qtext.split('\n').forEach(l=>{if(l.trim())html+=`<p>${esc(l)}</p>\n`;});
-  if(imgurl){let is=`max-width: ${width}; height: auto; display: block;`;if(border!=='none')is+=` border: ${border};`;let ws='margin: 12px 0;';if(align==='center'){ws+=' text-align: center;';is+=' margin-left: auto; margin-right: auto;';}else if(align==='right'){ws+=' text-align: right;';is+=' margin-left: auto;';}html+=`<div style="${ws}">\n  <img src="${esc(imgurl)}" alt="${esc(imgalt)}" style="${is}" />\n</div>\n`;}
-  if(extra)extra.split('\n').forEach(l=>{if(l.trim())html+=`<p style="font-size: 0.9em; color: #555555; margin-top: 4px;">${esc(l)}</p>\n`;});
-  return html.trim();
-}
-function update(){
-  const html=buildHTML(),preview=document.getElementById('preview'),codebox=document.getElementById('codebox'),emptyNotice=document.getElementById('emptyNotice'),codeWrap=document.getElementById('codeWrap');
-  if(!html){preview.innerHTML='<span class="empty-state">Fill in the fields to see a preview here.</span>';emptyNotice.classList.remove('hidden');codeWrap.classList.add('hidden');return;}
-  emptyNotice.classList.add('hidden');codeWrap.classList.remove('hidden');codebox.textContent=html;
-  const qtext=document.getElementById('qtext').value.trim(),imgurl=document.getElementById('imgurl').value.trim(),imgalt=document.getElementById('imgalt').value.trim()||'Question image',align=document.getElementById('imgalign').value,border=document.getElementById('imgborder').value,width=getWidth(),extra=document.getElementById('extratext').value.trim();
-  let pv='';
-  if(qtext)qtext.split('\n').forEach(l=>{if(l.trim())pv+=`<p style="margin-bottom:6px;">${l}</p>`;});
-  if(imgurl){let is=`max-width:${width}; height:auto; display:block;`;if(border!=='none')is+=` border:${border};`;let cls='img-left';if(align==='center'){cls='img-center';is+=' margin-left:auto; margin-right:auto;';}else if(align==='right'){cls='img-right';is+=' margin-left:auto;';}pv+=`<div class="${cls}"><img src="${imgurl}" alt="${imgalt}" style="${is}" /></div>`;}
-  if(extra)extra.split('\n').forEach(l=>{if(l.trim())pv+=`<p style="font-size:0.9em;color:#666;margin-top:4px;">${l}</p>`;});
-  preview.innerHTML=pv;
-}
-function copyCode(){
-  const code=document.getElementById('codebox').textContent; if(!code)return;
-  const btn=document.getElementById('copybtn');
-  const ok=()=>{btn.classList.replace('btn-primary','btn-success');btn.innerHTML=`<svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M2 6.5l3.5 3.5 5.5-6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg> Copied!`;setTimeout(()=>{btn.classList.replace('btn-success','btn-primary');btn.innerHTML=`<svg width="13" height="13" viewBox="0 0 13 13" fill="none"><rect x="3.5" y="0.5" width="9" height="9" rx="1.5" stroke="white" stroke-width="1.2"/><rect x="0.5" y="3.5" width="9" height="9" rx="1.5" fill="#1a4fd8" stroke="white" stroke-width="1.2"/></svg> Copy HTML`;},2500);};
-  navigator.clipboard.writeText(code).then(ok).catch(()=>{const ta=document.createElement('textarea');ta.value=code;ta.style.cssText='position:fixed;opacity:0;';document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);ok();});
-}
-function resetAll(){
-  ['qtext','imgurl','imgalt','extratext'].forEach(id=>document.getElementById(id).value='');
-  document.getElementById('imgwidth').value='400px';document.getElementById('imgalign').value='center';document.getElementById('imgborder').value='none';document.getElementById('customWidth').value='';
-  document.getElementById('customWidthWrap').classList.add('hidden');document.getElementById('thumbPreview').classList.add('hidden');document.getElementById('uploadStatus').classList.add('hidden');document.getElementById('uploadedFiles').innerHTML='';update();
-}
-['qtext','imgurl','imgalt','extratext','customWidth'].forEach(id=>document.getElementById(id).addEventListener('input',update));
-['imgwidth','imgalign','imgborder'].forEach(id=>document.getElementById(id).addEventListener('change',update));
-document.getElementById('imgwidth').addEventListener('change',function(){document.getElementById('customWidthWrap').classList.toggle('hidden',this.value!=='custom');});
-
-/* ═══ TABLE / RUBRIC BUILDER ═══ */
+/* ══════════════════════════════════════════════════
+   TABLE / RUBRIC BUILDER
+   ══════════════════════════════════════════════════ */
 let tableData = [];
 let currentStyle = 'striped';
-
 function escH(s){return(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
-
-function initTableData(rows,cols,prefill){
-  tableData=[];
-  for(let r=0;r<rows;r++){tableData[r]=[];for(let c=0;c<cols;c++)tableData[r][c]=(prefill&&prefill[r]&&prefill[r][c]!==undefined)?prefill[r][c]:'';}
-}
-
+function initTableData(rows,cols,prefill){tableData=[];for(let r=0;r<rows;r++){tableData[r]=[];for(let c=0;c<cols;c++)tableData[r][c]=(prefill&&prefill[r]&&prefill[r][c]!==undefined)?prefill[r][c]:'';}}
 function applyTemplate(name){
   let rows,cols,data,style='striped';
-  if(name==='rubric4'){
-    rows=5;cols=5;style='rubric';
-    data=[
-      ['Criteria','Excellent (4)','Proficient (3)','Developing (2)','Beginning (1)'],
-      ['Content & Ideas','Exceptionally clear and detailed.','Mostly clear with minor gaps.','Somewhat clear; key ideas missing.','Unclear or missing.'],
-      ['Organisation','Logically structured throughout.','Generally organised.','Some structure present.','Little to no structure.'],
-      ['Language Use','Precise, varied vocabulary.','Mostly appropriate language.','Some errors; meaning clear.','Frequent errors; hard to follow.'],
-      ['Mechanics','No errors in spelling/grammar.','Few minor errors.','Noticeable errors.','Many errors throughout.'],
-    ];
-    document.getElementById('hasFirstColHeader').checked=true;
-  }else if(name==='rubric3'){
-    rows=4;cols=4;style='rubric';
-    data=[
-      ['Criteria','Excellent (3)','Satisfactory (2)','Needs Improvement (1)'],
-      ['Criterion 1','','',''],
-      ['Criterion 2','','',''],
-      ['Criterion 3','','',''],
-    ];
-    document.getElementById('hasFirstColHeader').checked=true;
-  }else if(name==='checklist'){
-    rows=6;cols=3;style='striped';
-    data=[
-      ['Task / Indicator','Marks','Notes / Evidence'],
-      ['Item 1','',''],
-      ['Item 2','',''],
-      ['Item 3','',''],
-      ['Item 4','',''],
-      ['Total','',''],
-    ];
-    document.getElementById('hasFirstColHeader').checked=false;
-  }else{
-    rows=3;cols=3;style='striped';
-    data=[['Header 1','Header 2','Header 3'],['','',''],['','','']];
-    document.getElementById('hasFirstColHeader').checked=false;
-  }
+  if(name==='rubric4'){rows=5;cols=5;style='rubric';data=[['Criteria','Excellent (4)','Proficient (3)','Developing (2)','Beginning (1)'],['Content & Ideas','Exceptionally clear and detailed.','Mostly clear with minor gaps.','Somewhat clear; key ideas missing.','Unclear or missing.'],['Organisation','Logically structured throughout.','Generally organised.','Some structure present.','Little to no structure.'],['Language Use','Precise, varied vocabulary.','Mostly appropriate language.','Some errors; meaning clear.','Frequent errors; hard to follow.'],['Mechanics','No errors in spelling/grammar.','Few minor errors.','Noticeable errors.','Many errors throughout.']];document.getElementById('hasFirstColHeader').checked=true;}
+  else if(name==='rubric3'){rows=4;cols=4;style='rubric';data=[['Criteria','Excellent (3)','Satisfactory (2)','Needs Improvement (1)'],['Criterion 1','','',''],['Criterion 2','','',''],['Criterion 3','','','']];document.getElementById('hasFirstColHeader').checked=true;}
+  else if(name==='checklist'){rows=6;cols=3;style='striped';data=[['Task / Indicator','Marks','Notes / Evidence'],['Item 1','',''],['Item 2','',''],['Item 3','',''],['Item 4','',''],['Total','','']];document.getElementById('hasFirstColHeader').checked=false;}
+  else{rows=3;cols=3;style='striped';data=[['Header 1','Header 2','Header 3'],['','',''],['','','']];document.getElementById('hasFirstColHeader').checked=false;}
   document.getElementById('hasHeader').checked=true;
   document.getElementById('tblRows').value=rows;
   document.getElementById('tblCols').value=cols;
   setStyle(style,document.querySelector(`.style-chip[data-style="${style}"]`));
-  initTableData(rows,cols,data);
-  renderEditor();
-  updateTableOutput();
+  initTableData(rows,cols,data);renderEditor();updateTableOutput();
 }
-
-function rebuildTable(){
-  const rows=parseInt(document.getElementById('tblRows').value)||3;
-  const cols=parseInt(document.getElementById('tblCols').value)||3;
-  const old=tableData;
-  initTableData(rows,cols,old);
-  renderEditor();
-  updateTableOutput();
-}
-
-function setStyle(style,btn){
-  currentStyle=style;
-  document.querySelectorAll('.style-chip').forEach(c=>c.classList.remove('active'));
-  if(btn)btn.classList.add('active');
-  updateTableOutput();
-}
-
+function rebuildTable(){const rows=parseInt(document.getElementById('tblRows').value)||3,cols=parseInt(document.getElementById('tblCols').value)||3,old=tableData;initTableData(rows,cols,old);renderEditor();updateTableOutput();}
+function setStyle(style,btn){currentStyle=style;document.querySelectorAll('.style-chip').forEach(c=>c.classList.remove('active'));if(btn)btn.classList.add('active');updateTableOutput();}
 function renderEditor(){
-  const rows=tableData.length;
-  const cols=tableData[0]?tableData[0].length:0;
-  const hasHeader=document.getElementById('hasHeader').checked;
-  const hasFC=document.getElementById('hasFirstColHeader').checked;
-
-  let h=`<table class="rubric-grid">`;
-
-  // Top control row
-  h+=`<tr><td class="col-ctrl-cell" style="width:28px;"></td>`;
-  for(let c=0;c<cols;c++) h+=`<td class="col-ctrl-cell"><button class="ctrl-btn del" title="Remove column" onclick="removeCol(${c})">×</button></td>`;
+  const rows=tableData.length,cols=tableData[0]?tableData[0].length:0,hasHeader=document.getElementById('hasHeader').checked,hasFC=document.getElementById('hasFirstColHeader').checked;
+  let h=`<table class="rubric-grid"><tr><td class="col-ctrl-cell" style="width:28px;"></td>`;
+  for(let c=0;c<cols;c++)h+=`<td class="col-ctrl-cell"><button class="ctrl-btn del" title="Remove column" onclick="removeCol(${c})">×</button></td>`;
   h+=`<td class="col-ctrl-cell"><button class="ctrl-btn add" title="Add column" onclick="addCol()">+</button></td></tr>`;
-
   for(let r=0;r<rows;r++){
-    h+=`<tr>`;
-    h+=`<td class="row-ctrl-cell"><button class="ctrl-btn del" title="Remove row" onclick="removeRow(${r})">×</button></td>`;
-    for(let c=0;c<cols;c++){
-      const isH=(hasHeader&&r===0)||(hasFC&&c===0);
-      const tag=isH?'th':'td';
-      const val=(tableData[r]&&tableData[r][c]!==undefined)?tableData[r][c]:'';
-      h+=`<${tag}><textarea class="cell-input" data-r="${r}" data-c="${c}" oninput="onCellInput(this)" placeholder="${isH?'Header':'Cell'}">${escH(val)}</textarea></${tag}>`;
-    }
+    h+=`<tr><td class="row-ctrl-cell"><button class="ctrl-btn del" title="Remove row" onclick="removeRow(${r})">×</button></td>`;
+    for(let c=0;c<cols;c++){const isH=(hasHeader&&r===0)||(hasFC&&c===0),tag=isH?'th':'td',val=(tableData[r]&&tableData[r][c]!==undefined)?tableData[r][c]:'';h+=`<${tag}><textarea class="cell-input" data-r="${r}" data-c="${c}" oninput="onCellInput(this)" placeholder="${isH?'Header':'Cell'}">${escH(val)}</textarea></${tag}>`;}
     h+=`<td class="col-ctrl-cell"></td></tr>`;
   }
-
-  // Bottom add-row row
   h+=`<tr><td class="col-ctrl-cell"><button class="ctrl-btn add" title="Add row" onclick="addRow()">+</button></td>`;
-  for(let c=0;c<=cols;c++) h+=`<td class="col-ctrl-cell"></td>`;
+  for(let c=0;c<=cols;c++)h+=`<td class="col-ctrl-cell"></td>`;
   h+=`</tr></table>`;
-
   document.getElementById('tableEditorWrap').innerHTML=h;
 }
-
-function onCellInput(el){
-  const r=parseInt(el.dataset.r),c=parseInt(el.dataset.c);
-  if(!tableData[r])tableData[r]=[];
-  tableData[r][c]=el.value;
-  updateTableOutput();
-}
+function onCellInput(el){const r=parseInt(el.dataset.r),c=parseInt(el.dataset.c);if(!tableData[r])tableData[r]=[];tableData[r][c]=el.value;updateTableOutput();}
 function addRow(){const cols=tableData[0]?tableData[0].length:3;tableData.push(new Array(cols).fill(''));document.getElementById('tblRows').value=tableData.length;renderEditor();updateTableOutput();}
 function removeRow(r){if(tableData.length<=1)return;tableData.splice(r,1);document.getElementById('tblRows').value=tableData.length;renderEditor();updateTableOutput();}
 function addCol(){tableData.forEach(row=>row.push(''));document.getElementById('tblCols').value=tableData[0].length;renderEditor();updateTableOutput();}
 function removeCol(c){if(tableData[0]&&tableData[0].length<=1)return;tableData.forEach(row=>row.splice(c,1));document.getElementById('tblCols').value=tableData[0].length;renderEditor();updateTableOutput();}
-
 function buildTableHTML(){
-  const hasHeader=document.getElementById('hasHeader').checked;
-  const hasFC=document.getElementById('hasFirstColHeader').checked;
-  const s=currentStyle;
-  const styles={
-    striped:{table:'border-collapse:collapse;width:100%;font-family:Arial,sans-serif;font-size:14px;',th:'background:#1a4fd8;color:#ffffff;padding:8px 12px;border:1px solid #1a4fd8;text-align:left;',td:'padding:8px 12px;border:1px solid #cccccc;',tdAlt:'padding:8px 12px;border:1px solid #cccccc;background:#f7f7f5;'},
-    rubric:{table:'border-collapse:collapse;width:100%;font-family:Arial,sans-serif;font-size:14px;',th:'background:#1a4fd8;color:#ffffff;padding:8px 12px;border:1px solid #1a4fd8;text-align:center;',thCorner:'background:#0f2d82;color:#ffffff;padding:8px 12px;border:1px solid #0f2d82;text-align:left;',thRow:'background:#eef2fd;padding:8px 12px;border:1px solid #b4c4f0;font-weight:600;',td:'padding:8px 12px;border:1px solid #cccccc;vertical-align:top;'},
-    minimal:{table:'border-collapse:collapse;width:100%;font-family:Arial,sans-serif;font-size:14px;',th:'padding:8px 12px;border-bottom:2px solid #1a4fd8;text-align:left;font-weight:600;',td:'padding:8px 12px;border-bottom:1px solid #dddddd;'},
-    bordered:{table:'border-collapse:collapse;width:100%;font-family:Arial,sans-serif;font-size:14px;',th:'background:#333333;color:#ffffff;padding:8px 12px;border:2px solid #333333;',td:'padding:8px 12px;border:2px solid #333333;'},
-    plain:{table:'border-collapse:collapse;width:100%;font-family:Arial,sans-serif;font-size:14px;',th:'background:#f5f5f5;padding:8px 12px;border:1px solid #cccccc;font-weight:600;',td:'padding:8px 12px;border:1px solid #cccccc;'}
-  };
+  const hasHeader=document.getElementById('hasHeader').checked,hasFC=document.getElementById('hasFirstColHeader').checked,s=currentStyle;
+  const styles={striped:{table:'border-collapse:collapse;width:100%;font-family:Arial,sans-serif;font-size:14px;',th:'background:#1a4fd8;color:#ffffff;padding:8px 12px;border:1px solid #1a4fd8;text-align:left;',td:'padding:8px 12px;border:1px solid #cccccc;',tdAlt:'padding:8px 12px;border:1px solid #cccccc;background:#f7f7f5;'},rubric:{table:'border-collapse:collapse;width:100%;font-family:Arial,sans-serif;font-size:14px;',th:'background:#1a4fd8;color:#ffffff;padding:8px 12px;border:1px solid #1a4fd8;text-align:center;',thCorner:'background:#0f2d82;color:#ffffff;padding:8px 12px;border:1px solid #0f2d82;text-align:left;',thRow:'background:#eef2fd;padding:8px 12px;border:1px solid #b4c4f0;font-weight:600;',td:'padding:8px 12px;border:1px solid #cccccc;vertical-align:top;'},minimal:{table:'border-collapse:collapse;width:100%;font-family:Arial,sans-serif;font-size:14px;',th:'padding:8px 12px;border-bottom:2px solid #1a4fd8;text-align:left;font-weight:600;',td:'padding:8px 12px;border-bottom:1px solid #dddddd;'},bordered:{table:'border-collapse:collapse;width:100%;font-family:Arial,sans-serif;font-size:14px;',th:'background:#333333;color:#ffffff;padding:8px 12px;border:2px solid #333333;',td:'padding:8px 12px;border:2px solid #333333;'},plain:{table:'border-collapse:collapse;width:100%;font-family:Arial,sans-serif;font-size:14px;',th:'background:#f5f5f5;padding:8px 12px;border:1px solid #cccccc;font-weight:600;',td:'padding:8px 12px;border:1px solid #cccccc;'}};
   const st=styles[s]||styles.plain;
   let html=`<table style="${st.table}">\n`;
-  tableData.forEach((row,r)=>{
-    html+=`  <tr>\n`;
-    row.forEach((cell,c)=>{
-      const isRowH=hasHeader&&r===0;
-      const isColH=hasFC&&c===0;
-      const isH=isRowH||isColH;
-      const tag=isH?'th':'td';
-      let cs='';
-      if(isH){
-        if(s==='rubric'&&isRowH&&c===0&&hasFC) cs=st.thCorner||st.th;
-        else if(s==='rubric'&&isColH&&!isRowH) cs=st.thRow||st.td;
-        else cs=st.th;
-      }else{
-        const isAlt=(s==='striped')&&r%2===0;
-        cs=(isAlt&&st.tdAlt)?st.tdAlt:st.td;
-      }
-      html+=`    <${tag} style="${cs}">${esc(cell||'')}</${tag}>\n`;
-    });
-    html+=`  </tr>\n`;
-  });
-  html+=`</table>`;
-  return html;
+  tableData.forEach((row,r)=>{html+=`  <tr>\n`;row.forEach((cell,c)=>{const isRowH=hasHeader&&r===0,isColH=hasFC&&c===0,isH=isRowH||isColH,tag=isH?'th':'td';let cs='';if(isH){if(s==='rubric'&&isRowH&&c===0&&hasFC)cs=st.thCorner||st.th;else if(s==='rubric'&&isColH&&!isRowH)cs=st.thRow||st.td;else cs=st.th;}else{const isAlt=(s==='striped')&&r%2===0;cs=(isAlt&&st.tdAlt)?st.tdAlt:st.td;}html+=`    <${tag} style="${cs}">${esc(cell||'')}</${tag}>\n`;});html+=`  </tr>\n`;});
+  html+=`</table>`;return html;
 }
-
 function updateTableOutput(){
-  const hasHeader=document.getElementById('hasHeader').checked;
-  const hasFC=document.getElementById('hasFirstColHeader').checked;
-  // Preview
-  const wrap=document.getElementById('tblPreviewWrap');
-  wrap.className=`tbl-preview-wrap style-${currentStyle}`;
-  let pv='<table>';
-  tableData.forEach((row,r)=>{
-    pv+='<tr>';
-    row.forEach((cell,c)=>{
-      const isH=(hasHeader&&r===0)||(hasFC&&c===0);
-      const tag=isH?'th':'td';
-      pv+=`<${tag}>${escH(cell)}</${tag}>`;
-    });
-    pv+='</tr>';
-  });
-  pv+='</table>';
-  wrap.innerHTML=pv;
-  // Code
-  document.getElementById('tblCodebox').textContent=buildTableHTML();
+  const hasHeader=document.getElementById('hasHeader').checked,hasFC=document.getElementById('hasFirstColHeader').checked;
+  const wrap=document.getElementById('tblPreviewWrap');wrap.className=`tbl-preview-wrap style-${currentStyle}`;
+  let pv='<table>';tableData.forEach((row,r)=>{pv+='<tr>';row.forEach((cell,c)=>{const isH=(hasHeader&&r===0)||(hasFC&&c===0),tag=isH?'th':'td';pv+=`<${tag}>${escH(cell)}</${tag}>`;});pv+='</tr>';});pv+='</table>';
+  wrap.innerHTML=pv;document.getElementById('tblCodebox').textContent=buildTableHTML();
 }
-
 function copyTableCode(){
-  const code=document.getElementById('tblCodebox').textContent; if(!code)return;
+  const code=document.getElementById('tblCodebox').textContent;if(!code)return;
   const btn=document.getElementById('tblCopybtn');
   const ok=()=>{btn.classList.replace('btn-primary','btn-success');btn.innerHTML=`<svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M2 6.5l3.5 3.5 5.5-6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg> Copied!`;setTimeout(()=>{btn.classList.replace('btn-success','btn-primary');btn.innerHTML=`<svg width="13" height="13" viewBox="0 0 13 13" fill="none"><rect x="3.5" y="0.5" width="9" height="9" rx="1.5" stroke="white" stroke-width="1.2"/><rect x="0.5" y="3.5" width="9" height="9" rx="1.5" fill="#1a4fd8" stroke="white" stroke-width="1.2"/></svg> Copy HTML`;},2500);};
   navigator.clipboard.writeText(code).then(ok).catch(()=>{const ta=document.createElement('textarea');ta.value=code;ta.style.cssText='position:fixed;opacity:0;';document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);ok();});
 }
-
-// Init
 applyTemplate('rubric4');
 </script>
 </body>
