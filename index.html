@@ -1,0 +1,242 @@
+
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: var(--font-sans); }
+  .wrap { padding: 1rem 0; }
+  label { display: block; font-size: 13px; color: var(--color-text-secondary); margin-bottom: 4px; margin-top: 12px; }
+  input[type=text], textarea, select { width: 100%; font-family: var(--font-sans); }
+  textarea { resize: vertical; min-height: 80px; }
+  .row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .section { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 1rem 1.25rem; margin-bottom: 12px; }
+  .section-title { font-size: 13px; font-weight: 500; color: var(--color-text-secondary); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.04em; }
+  .preview-box { background: var(--color-background-secondary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); padding: 1rem 1.25rem; font-size: 15px; color: var(--color-text-primary); min-height: 80px; line-height: 1.7; }
+  .preview-box img { display: block; margin-top: 10px; border-radius: 4px; }
+  .code-box { background: var(--color-background-secondary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); padding: 1rem; font-family: var(--font-mono); font-size: 12px; color: var(--color-text-primary); white-space: pre-wrap; word-break: break-all; min-height: 60px; line-height: 1.6; overflow-x: auto; }
+  .btn-row { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+  button { font-family: var(--font-sans); cursor: pointer; }
+  .btn-copy { background: var(--color-background-info); color: var(--color-text-info); border: 0.5px solid var(--color-border-info); border-radius: var(--border-radius-md); padding: 7px 16px; font-size: 13px; font-weight: 500; }
+  .btn-copy:hover { opacity: 0.85; }
+  .btn-reset { background: transparent; color: var(--color-text-secondary); border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-md); padding: 7px 16px; font-size: 13px; }
+  .tag { display: inline-block; font-size: 11px; padding: 2px 8px; border-radius: 20px; margin-left: 6px; vertical-align: middle; }
+  .tag-opt { background: var(--color-background-secondary); color: var(--color-text-tertiary); border: 0.5px solid var(--color-border-tertiary); }
+  .note { font-size: 12px; color: var(--color-text-tertiary); margin-top: 4px; line-height: 1.5; }
+  .img-controls { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+  .copied { background: var(--color-background-success) !important; color: var(--color-text-success) !important; border-color: var(--color-border-success) !important; }
+  .divider { border: none; border-top: 0.5px solid var(--color-border-tertiary); margin: 12px 0; }
+</style>
+
+<div class="wrap">
+  <div class="section">
+    <div class="section-title">Question text</div>
+    <label>Question stem / instruction</label>
+    <textarea id="qtext" placeholder="e.g. Study the image below and answer the following question.&#10;&#10;What is shown in the diagram?"></textarea>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Image <span class="tag tag-opt">optional</span></div>
+    <label>Image URL (from Moodle file manager)</label>
+    <input type="text" id="imgurl" placeholder="http://192.168.1.20/seas/pluginfile.php/..." />
+    <label>Alt text (describe the image for accessibility)</label>
+    <input type="text" id="imgalt" placeholder="e.g. Diagram of a cell structure" />
+    <div class="img-controls" style="margin-top:10px;">
+      <div>
+        <label>Max width</label>
+        <select id="imgwidth">
+          <option value="300px">Small (300px)</option>
+          <option value="450px" selected>Medium (450px)</option>
+          <option value="600px">Large (600px)</option>
+          <option value="100%">Full width</option>
+          <option value="custom">Custom…</option>
+        </select>
+      </div>
+      <div>
+        <label>Alignment</label>
+        <select id="imgalign">
+          <option value="left">Left</option>
+          <option value="center" selected>Center</option>
+          <option value="right">Right</option>
+        </select>
+      </div>
+      <div>
+        <label>Border</label>
+        <select id="imgborder">
+          <option value="none" selected>None</option>
+          <option value="1px solid #ccc">Light border</option>
+          <option value="2px solid #555">Dark border</option>
+        </select>
+      </div>
+    </div>
+    <div id="customWidthWrap" style="display:none; margin-top:8px;">
+      <label>Enter custom width (e.g. 350px or 80%)</label>
+      <input type="text" id="customWidth" placeholder="350px" />
+    </div>
+    <p class="note">Tip: Copy the file URL from Moodle → Course files → right-click the image → Copy link address</p>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Extra content <span class="tag tag-opt">optional</span></div>
+    <label>Additional text below image (hints, source, units, etc.)</label>
+    <textarea id="extratext" placeholder="e.g. Figure 1. Cross-section of a plant cell (×400 magnification)&#10;&#10;Note: All measurements are in micrometres (µm)." style="min-height:60px;"></textarea>
+  </div>
+
+  <hr class="divider">
+
+  <div class="section">
+    <div class="section-title">Live preview</div>
+    <div class="preview-box" id="preview">Fill in the fields above to see a preview.</div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Generated HTML — paste into Moodle question editor (source view)</div>
+    <div class="code-box" id="codebox"></div>
+    <div class="btn-row">
+      <button class="btn-copy" id="copybtn" onclick="copyCode()">Copy HTML</button>
+      <button class="btn-reset" onclick="resetAll()">Reset</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const ids = ['qtext','imgurl','imgalt','imgwidth','imgalign','imgborder','customWidth','extratext'];
+ids.forEach(id => {
+  const el = document.getElementById(id);
+  if (el) el.addEventListener('input', update);
+  if (el && el.tagName === 'SELECT') el.addEventListener('change', update);
+});
+
+document.getElementById('imgwidth').addEventListener('change', function() {
+  document.getElementById('customWidthWrap').style.display = this.value === 'custom' ? 'block' : 'none';
+  update();
+});
+
+function getWidth() {
+  const sel = document.getElementById('imgwidth').value;
+  if (sel === 'custom') {
+    const cw = document.getElementById('customWidth').value.trim();
+    return cw || '450px';
+  }
+  return sel;
+}
+
+function escapeHtml(str) {
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function buildHTML() {
+  const qtext = document.getElementById('qtext').value.trim();
+  const imgurl = document.getElementById('imgurl').value.trim();
+  const imgalt = document.getElementById('imgalt').value.trim() || 'Question image';
+  const align = document.getElementById('imgalign').value;
+  const border = document.getElementById('imgborder').value;
+  const width = getWidth();
+  const extra = document.getElementById('extratext').value.trim();
+
+  let html = '';
+
+  if (qtext) {
+    const lines = qtext.split('\n');
+    lines.forEach((line, i) => {
+      if (line.trim() === '') {
+        html += '\n';
+      } else {
+        html += `<p>${escapeHtml(line)}</p>\n`;
+      }
+    });
+  }
+
+  if (imgurl) {
+    let wrapStyle = '';
+    let imgStyle = `max-width: ${width}; height: auto; display: block;`;
+    if (border !== 'none') imgStyle += ` border: ${border};`;
+    if (align === 'center') {
+      wrapStyle = 'text-align: center; margin: 12px 0;';
+    } else if (align === 'right') {
+      wrapStyle = 'text-align: right; margin: 12px 0;';
+    } else {
+      wrapStyle = 'margin: 12px 0;';
+    }
+    html += `<div style="${wrapStyle}">\n  <img src="${escapeHtml(imgurl)}" alt="${escapeHtml(imgalt)}" style="${imgStyle}" />\n</div>\n`;
+  }
+
+  if (extra) {
+    const lines = extra.split('\n');
+    lines.forEach(line => {
+      if (line.trim() === '') {
+        html += '\n';
+      } else {
+        html += `<p style="font-size: 0.9em; color: #555;">${escapeHtml(line)}</p>\n`;
+      }
+    });
+  }
+
+  return html.trim();
+}
+
+function update() {
+  const html = buildHTML();
+
+  const previewEl = document.getElementById('preview');
+  const codeEl = document.getElementById('codebox');
+
+  if (!html) {
+    previewEl.innerHTML = '<span style="color:var(--color-text-tertiary)">Fill in the fields above to see a preview.</span>';
+    codeEl.textContent = '';
+    return;
+  }
+
+  const imgurl = document.getElementById('imgurl').value.trim();
+  const imgalt = document.getElementById('imgalt').value.trim() || 'Question image';
+  const align = document.getElementById('imgalign').value;
+  const border = document.getElementById('imgborder').value;
+  const width = getWidth();
+  const qtext = document.getElementById('qtext').value.trim();
+  const extra = document.getElementById('extratext').value.trim();
+
+  let previewHtml = '';
+  if (qtext) {
+    qtext.split('\n').forEach(line => {
+      if (line.trim()) previewHtml += `<p style="margin-bottom:6px;">${line}</p>`;
+    });
+  }
+  if (imgurl) {
+    let imgStyle = `max-width: ${width}; height: auto; display: block;`;
+    if (border !== 'none') imgStyle += ` border: ${border};`;
+    let wrapStyle = 'margin: 10px 0;';
+    if (align === 'center') wrapStyle += ' text-align: center;';
+    else if (align === 'right') wrapStyle += ' text-align: right;';
+    previewHtml += `<div style="${wrapStyle}"><img src="${imgurl}" alt="${imgalt}" style="${imgStyle}" onerror="this.style.display='none'; this.nextSibling.style.display='block';" /><span style="display:none; font-size:12px; color:var(--color-text-tertiary); font-style:italic;">⚠ Image not reachable from this browser (it may be on your local network). The HTML code is still correct.</span></div>`;
+  }
+  if (extra) {
+    extra.split('\n').forEach(line => {
+      if (line.trim()) previewHtml += `<p style="font-size:0.9em; color:#777; margin-top:4px;">${line}</p>`;
+    });
+  }
+  previewEl.innerHTML = previewHtml;
+  codeEl.textContent = html;
+}
+
+function copyCode() {
+  const code = document.getElementById('codebox').textContent;
+  if (!code) return;
+  navigator.clipboard.writeText(code).then(() => {
+    const btn = document.getElementById('copybtn');
+    btn.textContent = 'Copied!';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'Copy HTML'; btn.classList.remove('copied'); }, 2000);
+  });
+}
+
+function resetAll() {
+  document.getElementById('qtext').value = '';
+  document.getElementById('imgurl').value = '';
+  document.getElementById('imgalt').value = '';
+  document.getElementById('imgwidth').value = '450px';
+  document.getElementById('imgalign').value = 'center';
+  document.getElementById('imgborder').value = 'none';
+  document.getElementById('extratext').value = '';
+  document.getElementById('customWidthWrap').style.display = 'none';
+  update();
+}
+
+update();
+</script>
