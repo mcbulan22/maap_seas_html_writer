@@ -1,133 +1,766 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SEAS Advanced Moodle Builder (Google Drive)</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>SEAS Moodle Question HTML Builder</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
 <style>
-body{font-family:Arial;background:#f5f4f0;margin:0}
-header{background:#fff;padding:10px 20px;border-bottom:1px solid #ddd;font-weight:bold}
-.layout{display:grid;grid-template-columns:400px 1fr;height:calc(100vh - 48px)}
-.left{padding:15px;background:#fff;border-right:1px solid #ddd;overflow:auto}
-.right{padding:15px;display:flex;flex-direction:column;gap:10px}
-textarea,input,select{width:100%;padding:6px;margin-bottom:8px}
-.card{background:#fff;border:1px solid #ddd;border-radius:6px}
-.card h3{margin:0;padding:8px;border-bottom:1px solid #eee;font-size:12px}
-.card-body{padding:10px}
-.btn{background:#1a4fd8;color:#fff;border:none;padding:6px 12px;cursor:pointer;margin-top:5px}
-.img-list{display:flex;flex-direction:column;gap:6px}
-.img-item{background:#eee;padding:6px;cursor:pointer}
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #f5f4f0; --surface: #ffffff; --surface2: #f0efe9;
+    --border: #d8d6ce; --border2: #c4c2b8;
+    --text: #1a1916; --text2: #5a5850; --text3: #8a8880;
+    --accent: #1a4fd8; --accent-bg: #eef2fd; --accent-border: #b4c4f0;
+    --success: #1a7a4a; --success-bg: #eaf5ee; --success-border: #a8d8bc;
+    --danger: #b91c1c; --danger-bg: #fef2f2; --danger-border: #fca5a5;
+    --warn: #8a5a00; --warn-bg: #fff8e6; --warn-border: #f0d68a;
+    --radius: 8px; --radius-lg: 12px;
+    --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06);
+    --font: 'IBM Plex Sans', system-ui, sans-serif;
+    --mono: 'IBM Plex Mono', 'Courier New', monospace;
+  }
+  body { font-family: var(--font); background: var(--bg); color: var(--text); min-height: 100vh; font-size: 15px; line-height: 1.6; }
+
+  /* HEADER */
+  header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 0 2rem; display: flex; align-items: center; gap: 14px; height: 56px; position: sticky; top: 0; z-index: 10; }
+  .logo { width: 32px; height: 32px; background: var(--accent); border-radius: 7px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  header h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.01em; }
+  header p { font-size: 13px; color: var(--text3); margin-left: auto; }
+
+  /* TABS */
+  .tabs-bar { background: var(--surface); border-bottom: 1px solid var(--border); padding: 0 2rem; display: flex; position: sticky; top: 56px; z-index: 9; }
+  .tab-btn { font-family: var(--font); font-size: 13px; font-weight: 500; color: var(--text3); padding: 0 18px; height: 44px; border: none; background: none; cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.15s; display: flex; align-items: center; gap: 7px; margin-bottom: -1px; }
+  .tab-btn:hover { color: var(--text); }
+  .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+  .tab-pane { display: none; }
+  .tab-pane.active { display: contents; }
+
+  /* LAYOUT */
+  .layout { display: grid; grid-template-columns: 440px 1fr; min-height: calc(100vh - 100px); }
+  .panel-left { border-right: 1px solid var(--border); background: var(--surface); padding: 1.5rem; overflow-y: auto; max-height: calc(100vh - 100px); position: sticky; top: 100px; }
+  .panel-right { padding: 1.5rem; display: flex; flex-direction: column; gap: 1.25rem; }
+
+  /* SECTIONS */
+  .section { margin-bottom: 1.5rem; }
+  .section:last-child { margin-bottom: 0; }
+  .section-header { display: flex; align-items: center; gap: 8px; margin-bottom: 0.875rem; padding-bottom: 0.625rem; border-bottom: 1px solid var(--border); }
+  .section-icon { width: 24px; height: 24px; border-radius: 5px; display: flex; align-items: center; justify-content: center; background: var(--surface2); flex-shrink: 0; }
+  .section-title { font-size: 12px; font-weight: 600; color: var(--text2); text-transform: uppercase; letter-spacing: 0.06em; }
+  .badge { font-size: 10px; font-weight: 500; padding: 1px 6px; border-radius: 4px; background: var(--surface2); color: var(--text3); border: 1px solid var(--border); text-transform: uppercase; letter-spacing: 0.04em; }
+
+  /* FIELDS */
+  .field { margin-bottom: 0.875rem; }
+  .field:last-child { margin-bottom: 0; }
+  label { display: block; font-size: 12px; font-weight: 500; color: var(--text2); margin-bottom: 4px; }
+  input[type=text], input[type=number], textarea, select { width: 100%; font-family: var(--font); font-size: 14px; color: var(--text); background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 8px 10px; outline: none; transition: border-color 0.15s, box-shadow 0.15s; -webkit-appearance: none; appearance: none; }
+  select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' fill='none'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238a8880' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 10px center; padding-right: 28px; cursor: pointer; }
+  input[type=text]:focus, input[type=number]:focus, textarea:focus, select:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(26,79,216,0.1); }
+  textarea { resize: vertical; min-height: 88px; line-height: 1.6; }
+  .hint { font-size: 11px; color: var(--text3); margin-top: 4px; line-height: 1.5; }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+  .hidden { display: none !important; }
+
+  /* DROP ZONE */
+  .drop-zone { border: 2px dashed var(--border2); border-radius: var(--radius-lg); padding: 1.5rem 1rem; text-align: center; cursor: pointer; transition: all 0.2s; background: var(--surface2); position: relative; }
+  .drop-zone:hover, .drop-zone.dragover { border-color: var(--accent); background: var(--accent-bg); }
+  .drop-zone input[type=file] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; padding: 0; border: none; }
+  .drop-zone-icon { width: 36px; height: 36px; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; display: flex; align-items: center; justify-content: center; margin: 0 auto 8px; }
+  .drop-zone p { font-size: 13px; color: var(--text2); margin-bottom: 2px; font-weight: 500; }
+  .drop-zone span { font-size: 11px; color: var(--text3); }
+  .upload-status { margin-top: 10px; border-radius: var(--radius); padding: 10px 12px; font-size: 13px; display: flex; align-items: center; gap: 8px; line-height: 1.4; }
+  .upload-status.uploading { background: var(--accent-bg); border: 1px solid var(--accent-border); color: var(--accent); }
+  .upload-status.success { background: var(--success-bg); border: 1px solid var(--success-border); color: var(--success); }
+  .upload-status.error { background: var(--danger-bg); border: 1px solid var(--danger-border); color: var(--danger); }
+  .spinner { width: 14px; height: 14px; border: 2px solid var(--accent-border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.7s linear infinite; flex-shrink: 0; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .thumb-preview { margin-top: 10px; border-radius: var(--radius); overflow: hidden; border: 1px solid var(--border); max-height: 140px; display: flex; align-items: center; justify-content: center; background: var(--surface2); }
+  .thumb-preview img { max-width: 100%; max-height: 140px; display: block; object-fit: contain; }
+
+  /* CARDS */
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow); }
+  .card-header { padding: 0.875rem 1.25rem; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; background: var(--surface2); }
+  .card-header-title { font-size: 12px; font-weight: 600; color: var(--text2); text-transform: uppercase; letter-spacing: 0.06em; }
+  .card-body { padding: 1.25rem; }
+  .preview-render { font-size: 15px; line-height: 1.7; min-height: 60px; }
+  .preview-render p { margin-bottom: 6px; }
+  .preview-render img { max-width: 100%; height: auto; border-radius: 4px; margin-top: 10px; }
+  .preview-render .img-center { text-align: center; margin: 12px 0; }
+  .preview-render .img-right { text-align: right; margin: 12px 0; }
+  .preview-render .img-left { margin: 12px 0; }
+  .empty-state { color: var(--text3); font-size: 14px; font-style: italic; }
+  .code-block { font-family: var(--mono); font-size: 12.5px; line-height: 1.65; color: var(--text); background: var(--surface2); border-radius: var(--radius); padding: 1rem; white-space: pre-wrap; word-break: break-all; min-height: 56px; max-height: 320px; overflow-y: auto; border: 1px solid var(--border); }
+
+  /* BUTTONS */
+  .btn-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+  .btn { font-family: var(--font); font-size: 13px; font-weight: 500; padding: 8px 16px; border-radius: var(--radius); cursor: pointer; border: 1px solid transparent; transition: all 0.15s; display: inline-flex; align-items: center; gap: 6px; }
+  .btn-primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .btn-primary:hover { background: #1540b0; }
+  .btn-primary:active { transform: scale(0.98); }
+  .btn-success { background: var(--success-bg); color: var(--success); border-color: var(--success-border); }
+  .btn-ghost { background: transparent; color: var(--text2); border-color: var(--border2); }
+  .btn-ghost:hover { background: var(--surface2); }
+
+  /* MISC */
+  .notice { background: var(--warn-bg); border: 1px solid var(--warn-border); border-radius: var(--radius); padding: 10px 12px; font-size: 12.5px; color: var(--warn); line-height: 1.5; display: flex; gap: 8px; align-items: flex-start; }
+  .steps { display: flex; flex-direction: column; gap: 6px; margin-top: 4px; }
+  .step { display: flex; align-items: flex-start; gap: 10px; font-size: 13px; color: var(--text2); line-height: 1.5; }
+  .step-num { width: 20px; height: 20px; border-radius: 50%; background: var(--accent); color: #fff; font-size: 11px; font-weight: 600; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
+  .config-panel { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px; margin-top: 6px; }
+  .uploaded-files { margin-top: 10px; display: flex; flex-direction: column; gap: 6px; }
+  .uploaded-file-item { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text2); background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 6px 10px; cursor: pointer; transition: border-color 0.15s; }
+  .uploaded-file-item:hover { border-color: var(--accent); color: var(--accent); }
+  .uploaded-file-item .fname { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+  /* TABLE BUILDER */
+  .rubric-grid-wrap { overflow-x: auto; }
+  .rubric-grid { border-collapse: collapse; width: 100%; min-width: 400px; font-size: 13px; font-family: var(--font); }
+  .rubric-grid th, .rubric-grid td { border: 1px solid var(--border2); padding: 0; vertical-align: top; }
+  .rubric-grid th { background: var(--surface2); }
+  .cell-input { width: 100%; border: none; outline: none; background: transparent; font-family: var(--font); font-size: 13px; color: var(--text); padding: 7px 9px; resize: none; min-height: 50px; line-height: 1.5; display: block; }
+  .rubric-grid th .cell-input { font-weight: 600; color: var(--text2); min-height: 36px; }
+  .cell-input:focus { background: var(--accent-bg); }
+  .row-ctrl-cell { background: var(--surface2); border: 1px solid var(--border2); width: 28px; text-align: center; vertical-align: middle; }
+  .col-ctrl-cell { background: var(--surface2); border: 1px solid var(--border2); text-align: center; padding: 3px; }
+  .ctrl-btn { background: none; border: none; cursor: pointer; color: var(--text3); padding: 2px 5px; border-radius: 4px; font-size: 15px; line-height: 1; transition: all 0.12s; font-family: var(--font); }
+  .ctrl-btn:hover.del { color: var(--danger); background: var(--danger-bg); }
+  .ctrl-btn.del:hover { color: var(--danger); background: var(--danger-bg); }
+  .ctrl-btn.add { color: var(--accent); font-size: 17px; }
+  .ctrl-btn.add:hover { background: var(--accent-bg); }
+
+  /* Style chips */
+  .tbl-style-row { display: flex; gap: 7px; flex-wrap: wrap; margin-bottom: 1rem; }
+  .style-chip { font-size: 12px; padding: 5px 12px; border-radius: 20px; border: 1px solid var(--border2); background: var(--surface); cursor: pointer; transition: all 0.15s; color: var(--text2); font-family: var(--font); }
+  .style-chip.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+  /* Table preview */
+  .tbl-preview-wrap { overflow-x: auto; }
+  .tbl-preview-wrap table { border-collapse: collapse; width: 100%; font-size: 14px; font-family: var(--font); }
+  .tbl-preview-wrap td, .tbl-preview-wrap th { padding: 8px 12px; border: 1px solid #ccc; }
+  .tbl-preview-wrap.style-striped th { background: #1a4fd8; color: #fff; border-color: #1a4fd8; }
+  .tbl-preview-wrap.style-striped tr:nth-child(even) td { background: #f7f7f5; }
+  .tbl-preview-wrap.style-rubric th { background: #1a4fd8; color: #fff; text-align: center; }
+  .tbl-preview-wrap.style-rubric td { vertical-align: top; }
+  .tbl-preview-wrap.style-rubric tr th:first-child { background: #0f2d82; text-align: left; }
+  .tbl-preview-wrap.style-minimal td, .tbl-preview-wrap.style-minimal th { border: none; border-bottom: 1px solid #ddd; }
+  .tbl-preview-wrap.style-minimal th { border-bottom: 2px solid #1a4fd8; font-weight: 600; }
+  .tbl-preview-wrap.style-bordered td, .tbl-preview-wrap.style-bordered th { border: 2px solid #333; }
+  .tbl-preview-wrap.style-bordered th { background: #333; color: #fff; }
+  .tbl-preview-wrap.style-plain th { background: #f5f5f5; }
+
+  @media (max-width: 860px) {
+    .layout { grid-template-columns: 1fr; }
+    .panel-left { position: static; max-height: none; border-right: none; border-bottom: 1px solid var(--border); }
+    header p { display: none; }
+  }
 </style>
 </head>
 <body>
-<header>SEAS Advanced Builder (Google Drive)</header>
+
+<header>
+  <div class="logo">
+    <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+      <rect x="2" y="2" width="6" height="6" rx="1.5" fill="white" opacity="0.9"/>
+      <rect x="10" y="2" width="6" height="6" rx="1.5" fill="white" opacity="0.6"/>
+      <rect x="2" y="10" width="6" height="6" rx="1.5" fill="white" opacity="0.6"/>
+      <rect x="10" y="10" width="6" height="6" rx="1.5" fill="white" opacity="0.9"/>
+    </svg>
+  </div>
+  <h1>SEAS — Moodle Question HTML Builder</h1>
+  <p>Drag &amp; drop images · Auto-upload to GitHub · Generate Moodle HTML</p>
+</header>
+
+<div class="tabs-bar">
+  <button class="tab-btn active" onclick="switchTab('question',this)">
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 3h10M2 7h7M2 11h5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+    Question Builder
+  </button>
+  <button class="tab-btn" onclick="switchTab('table',this)">
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1" y="1" width="12" height="12" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M1 5h12M5 5v7" stroke="currentColor" stroke-width="1.3"/></svg>
+    Table / Rubric Builder
+  </button>
+</div>
+
+<!-- ══════════════════════ TAB: QUESTION BUILDER ══════════════════════ -->
+<div id="tab-question" class="tab-pane active">
+<div class="layout">
+  <div class="panel-left">
+
+    <div class="section">
+      <div class="section-header">
+        <div class="section-icon"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 3h10M2 7h7M2 11h5" stroke="#5a5850" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+        <span class="section-title">Question text</span>
+      </div>
+      <div class="field">
+        <label for="qtext">Question stem / instruction</label>
+        <textarea id="qtext" placeholder="e.g. Study the image below carefully.&#10;&#10;What process is illustrated in the diagram?"></textarea>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-header">
+        <div class="section-icon"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1" y="1" width="12" height="12" rx="2" stroke="#5a5850" stroke-width="1.5"/><circle cx="5" cy="5" r="1.5" fill="#5a5850"/><path d="M1 10l3-3 3 3 2-2 4 4" stroke="#5a5850" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <span class="section-title">Image</span>
+        <span class="badge">Optional</span>
+      </div>
+      <div class="drop-zone" id="dropZone">
+        <input type="file" id="fileInput" accept="image/*" />
+        <div class="drop-zone-icon">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+            <path d="M9 12V4M9 4L6 7M9 4l3 3" stroke="#5a5850" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M3 13v1a1 1 0 001 1h10a1 1 0 001-1v-1" stroke="#5a5850" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <p>Drag &amp; drop an image here</p>
+        <span>or click to browse — JPG, PNG, GIF, WebP</span>
+      </div>
+      <div id="thumbPreview" class="thumb-preview hidden"></div>
+      <div id="uploadStatus" class="hidden"></div>
+      <div class="uploaded-files" id="uploadedFiles"></div>
+      <div class="field" style="margin-top:10px;">
+        <label for="imgurl">Image URL <span style="font-weight:400;color:var(--text3);">— auto-filled after upload, or paste manually</span></label>
+        <input type="text" id="imgurl" placeholder="https://raw.githubusercontent.com/..." />
+      </div>
+      <div class="field">
+        <label for="imgalt">Alt text (describe the image)</label>
+        <input type="text" id="imgalt" placeholder="e.g. Diagram showing cell division stages" />
+      </div>
+      <div class="grid-3 field">
+        <div>
+          <label for="imgwidth">Max width</label>
+          <select id="imgwidth">
+            <option value="250px">Small — 250px</option>
+            <option value="400px" selected>Medium — 400px</option>
+            <option value="550px">Large — 550px</option>
+            <option value="100%">Full width</option>
+            <option value="custom">Custom…</option>
+          </select>
+        </div>
+        <div>
+          <label for="imgalign">Alignment</label>
+          <select id="imgalign">
+            <option value="left">Left</option>
+            <option value="center" selected>Center</option>
+            <option value="right">Right</option>
+          </select>
+        </div>
+        <div>
+          <label for="imgborder">Border</label>
+          <select id="imgborder">
+            <option value="none" selected>None</option>
+            <option value="1px solid #cccccc">Light</option>
+            <option value="2px solid #555555">Dark</option>
+          </select>
+        </div>
+      </div>
+      <div class="field hidden" id="customWidthWrap">
+        <label for="customWidth">Custom width (e.g. 350px or 70%)</label>
+        <input type="text" id="customWidth" placeholder="350px" />
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-header">
+        <div class="section-icon"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 4h10M2 7h6M2 10h8" stroke="#5a5850" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+        <span class="section-title">Caption / Notes</span>
+        <span class="badge">Optional</span>
+      </div>
+      <div class="field">
+        <label for="extratext">Text below image</label>
+        <textarea id="extratext" placeholder="e.g. Figure 1. Cross-section of a plant cell (×400)" style="min-height:64px;"></textarea>
+      </div>
+    </div>
+
+    <div class="section" style="display:none;">
+      <div class="config-panel" id="configPanel">
+        <div class="field"><label for="cfgUser">GitHub username</label><input type="text" id="cfgUser" /></div>
+        <div class="field"><label for="cfgRepo">Repository name</label><input type="text" id="cfgRepo" /></div>
+        <div class="field"><label for="cfgToken">Token</label><input type="text" id="cfgToken" /></div>
+        <div class="field"><label for="cfgFolder">Folder</label><input type="text" id="cfgFolder" /></div>
+        <button class="btn btn-primary" onclick="saveConfig()">Save</button>
+        <div id="configSaved" class="hidden" style="margin-top:8px;font-size:12px;color:var(--success);">✓ Saved</div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-header">
+        <div class="section-icon"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5.5" stroke="#5a5850" stroke-width="1.5"/><path d="M7 5v2.5l1.5 1.5" stroke="#5a5850" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+        <span class="section-title">How to use</span>
+      </div>
+      <div class="steps">
+        <div class="step"><div class="step-num">1</div><span>Type your question text above</span></div>
+        <div class="step"><div class="step-num">2</div><span>Drag &amp; drop an image — it uploads to GitHub automatically</span></div>
+        <div class="step"><div class="step-num">3</div><span>Adjust size, alignment, and add a caption if needed</span></div>
+        <div class="step"><div class="step-num">4</div><span>Click <strong>Copy HTML</strong> and paste into Moodle question source view (<strong>&lt;&gt;</strong>)</span></div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="panel-right">
+    <div class="card">
+      <div class="card-header">
+        <span class="card-header-title">Live preview</span>
+        <span style="font-size:12px;color:var(--text3);">How it will look in Moodle</span>
+      </div>
+      <div class="card-body">
+        <div class="preview-render" id="preview"><span class="empty-state">Fill in the fields to see a preview here.</span></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <span class="card-header-title">Generated HTML</span>
+        <span style="font-size:12px;color:var(--text3);">Paste into Moodle → question editor → Source view (&lt;&gt;)</span>
+      </div>
+      <div class="card-body">
+        <div class="notice" id="emptyNotice">
+          <span style="flex-shrink:0;margin-top:1px;"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5.5" stroke="#8a5a00" stroke-width="1.5"/><path d="M7 4.5v3M7 9.5v.5" stroke="#8a5a00" stroke-width="1.5" stroke-linecap="round"/></svg></span>
+          Start filling in the form to generate HTML code.
+        </div>
+        <div class="hidden" id="codeWrap">
+          <div class="code-block" id="codebox"></div>
+          <div class="btn-row">
+            <button class="btn btn-primary" id="copybtn" onclick="copyCode()">
+              <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><rect x="3.5" y="0.5" width="9" height="9" rx="1.5" stroke="white" stroke-width="1.2"/><rect x="0.5" y="3.5" width="9" height="9" rx="1.5" fill="#1a4fd8" stroke="white" stroke-width="1.2"/></svg>
+              Copy HTML
+            </button>
+            <button class="btn btn-ghost" onclick="resetAll()">Reset form</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ══════════════════════ TAB: TABLE / RUBRIC BUILDER ══════════════════════ -->
+<div id="tab-table" class="tab-pane">
 <div class="layout">
 
-<div class="left">
-<label>Question</label>
-<textarea id="qtext"></textarea>
+  <div class="panel-left">
 
-<label>Add Google Drive Image</label>
-<input type="text" id="imginput" placeholder="Paste Drive link">
-<button class="btn" onclick="addImage()">Add Image</button>
+    <div class="section">
+      <div class="section-header">
+        <div class="section-icon"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1" y="1" width="12" height="12" rx="2" stroke="#5a5850" stroke-width="1.5"/><path d="M1 5h12M5 5v7" stroke="#5a5850" stroke-width="1.3"/></svg></div>
+        <span class="section-title">Quick-start Templates</span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:6px;">
+        <button class="btn btn-ghost" style="justify-content:flex-start;text-align:left;" onclick="applyTemplate('rubric4')">
+          <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><rect x="0.5" y="0.5" width="12" height="12" rx="1.5" stroke="currentColor" stroke-width="1.1"/><path d="M0.5 4h12M4 4v8.5" stroke="currentColor" stroke-width="1.1"/></svg>
+          Rubric — 4 criteria, 4 performance levels
+        </button>
+        <button class="btn btn-ghost" style="justify-content:flex-start;text-align:left;" onclick="applyTemplate('rubric3')">
+          <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><rect x="0.5" y="0.5" width="12" height="12" rx="1.5" stroke="currentColor" stroke-width="1.1"/><path d="M0.5 4h12M4 4v8.5" stroke="currentColor" stroke-width="1.1"/></svg>
+          Rubric — 3 criteria, 3 performance levels
+        </button>
+        <button class="btn btn-ghost" style="justify-content:flex-start;text-align:left;" onclick="applyTemplate('checklist')">
+          <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><rect x="0.5" y="0.5" width="12" height="12" rx="1.5" stroke="currentColor" stroke-width="1.1"/><path d="M3 6.5l2 2 4-4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Checklist / Marking guide
+        </button>
+        <button class="btn btn-ghost" style="justify-content:flex-start;text-align:left;" onclick="applyTemplate('blank')">
+          <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><rect x="0.5" y="0.5" width="12" height="12" rx="1.5" stroke="currentColor" stroke-width="1.1"/></svg>
+          Blank table
+        </button>
+      </div>
+    </div>
 
-<div class="img-list" id="imgList"></div>
+    <div class="section">
+      <div class="section-header">
+        <div class="section-icon"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 3h10M2 7h10M2 11h10M5 1v12M9 1v12" stroke="#5a5850" stroke-width="1.3"/></svg></div>
+        <span class="section-title">Table Size</span>
+      </div>
+      <div class="grid-2 field">
+        <div>
+          <label for="tblRows">Rows (excl. header)</label>
+          <input type="number" id="tblRows" value="4" min="1" max="20" onchange="rebuildTable()" />
+        </div>
+        <div>
+          <label for="tblCols">Columns</label>
+          <input type="number" id="tblCols" value="5" min="1" max="12" onchange="rebuildTable()" />
+        </div>
+      </div>
+      <div class="field" style="display:flex;flex-direction:column;gap:8px;">
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin-bottom:0;">
+          <input type="checkbox" id="hasHeader" checked onchange="renderEditor();updateTableOutput()" style="width:auto;" />
+          First row is a header row
+        </label>
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin-bottom:0;">
+          <input type="checkbox" id="hasFirstColHeader" onchange="renderEditor();updateTableOutput()" style="width:auto;" />
+          First column is also a header
+        </label>
+      </div>
+    </div>
 
-<label>Table Rows</label>
-<input type="number" id="rows" value="3">
-<label>Table Columns</label>
-<input type="number" id="cols" value="3">
-<button class="btn" onclick="generateTable()">Insert Table</button>
+    <div class="section">
+      <div class="section-header">
+        <div class="section-icon"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="4" cy="7" r="2.2" fill="#5a5850"/><circle cx="10" cy="7" r="2.2" fill="#5a5850" opacity=".4"/><circle cx="7" cy="4" r="2.2" fill="#5a5850" opacity=".2"/></svg></div>
+        <span class="section-title">Style</span>
+      </div>
+      <div class="tbl-style-row">
+        <button class="style-chip active" data-style="striped"  onclick="setStyle('striped',this)">Striped</button>
+        <button class="style-chip"        data-style="rubric"   onclick="setStyle('rubric',this)">Rubric</button>
+        <button class="style-chip"        data-style="minimal"  onclick="setStyle('minimal',this)">Minimal</button>
+        <button class="style-chip"        data-style="bordered" onclick="setStyle('bordered',this)">Bordered</button>
+        <button class="style-chip"        data-style="plain"    onclick="setStyle('plain',this)">Plain</button>
+      </div>
+    </div>
 
-<button class="btn" onclick="update()">Generate HTML</button>
+    <div class="section">
+      <div class="section-header">
+        <div class="section-icon"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5.5" stroke="#5a5850" stroke-width="1.5"/><path d="M7 5v2.5l1.5 1.5" stroke="#5a5850" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+        <span class="section-title">How to use</span>
+      </div>
+      <div class="steps">
+        <div class="step"><div class="step-num">1</div><span>Pick a quick-start template, or set rows &amp; columns manually</span></div>
+        <div class="step"><div class="step-num">2</div><span>Click any cell and type your content directly in the grid</span></div>
+        <div class="step"><div class="step-num">3</div><span>Use <strong>+</strong> buttons to add rows/columns, <strong>×</strong> to remove them</span></div>
+        <div class="step"><div class="step-num">4</div><span>Pick a style, then click <strong>Copy HTML</strong> and paste into Moodle</span></div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="panel-right">
+
+    <div class="card">
+      <div class="card-header">
+        <span class="card-header-title">Table Editor</span>
+        <span style="font-size:12px;color:var(--text3);">Click any cell to edit · + to add · × to remove</span>
+      </div>
+      <div class="card-body" style="padding:0.75rem;">
+        <div class="rubric-grid-wrap" id="tableEditorWrap"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <span class="card-header-title">Live Preview</span>
+        <span style="font-size:12px;color:var(--text3);">How it will look in Moodle</span>
+      </div>
+      <div class="card-body">
+        <div class="tbl-preview-wrap style-striped" id="tblPreviewWrap">
+          <span class="empty-state">Your table preview will appear here.</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <span class="card-header-title">Generated HTML</span>
+        <span style="font-size:12px;color:var(--text3);">Paste into Moodle → question editor → Source view (&lt;&gt;)</span>
+      </div>
+      <div class="card-body">
+        <div class="code-block" id="tblCodebox"></div>
+        <div class="btn-row">
+          <button class="btn btn-primary" id="tblCopybtn" onclick="copyTableCode()">
+            <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><rect x="3.5" y="0.5" width="9" height="9" rx="1.5" stroke="white" stroke-width="1.2"/><rect x="0.5" y="3.5" width="9" height="9" rx="1.5" fill="#1a4fd8" stroke="white" stroke-width="1.2"/></svg>
+            Copy HTML
+          </button>
+          <button class="btn btn-ghost" onclick="applyTemplate('blank')">Reset table</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
 </div>
-
-<div class="right">
-<div class="card">
-<h3>Preview</h3>
-<div class="card-body" id="preview"></div>
-</div>
-
-<div class="card">
-<h3>HTML Output</h3>
-<div class="card-body">
-<textarea id="output" rows="10"></textarea>
-<button class="btn" onclick="copyCode()">Copy</button>
-</div>
-</div>
-</div>
-
 </div>
 
 <script>
-let images=[];
-let tableHTML='';
-
-function convert(url){
- let m=url.match(/\/file\/d\/([^\/]+)/);
- return m?`https://drive.google.com/thumbnail?id=${m[1]}`:url;
+/* ═══ SHARED ═══ */
+function switchTab(name, btn) {
+  document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  btn.classList.add('active');
 }
 
-function addImage(){
- let url=document.getElementById('imginput').value;
- if(!url)return;
- url=convert(url);
- images.push(url);
- renderImages();
- document.getElementById('imginput').value='';
+/* ═══ QUESTION BUILDER ═══ */
+const DEFAULTS = {
+  user: 'mcbulan22',
+  repo: 'maa-seas-question-images',
+  token: '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',
+  folder: 'images'
+};
+function getCfg() { return { ...DEFAULTS }; }
+function saveConfig() {
+  const msg = document.getElementById('configSaved');
+  msg.classList.remove('hidden');
+  setTimeout(() => msg.classList.add('hidden'), 2500);
 }
 
-function renderImages(){
- let list=document.getElementById('imgList');
- list.innerHTML='';
- images.forEach((img,i)=>{
- let div=document.createElement('div');
- div.className='img-item';
- div.innerText='Image '+(i+1);
- div.onclick=()=>{images.splice(i,1);renderImages();};
- list.appendChild(div);
- });
+async function uploadToGitHub(file) {
+  const cfg = getCfg();
+  if (!cfg.token) { showStatus('error','No GitHub token configured.'); return null; }
+  const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g,'_');
+  const fname    = `${Date.now()}_${safeName}`;
+  const path     = cfg.folder ? `${cfg.folder.replace(/\/$/,'')}/${fname}` : fname;
+  const apiUrl   = `https://api.github.com/repos/${cfg.user}/${cfg.repo}/contents/${path}`;
+  showStatus('uploading',`Uploading ${file.name}…`);
+  try {
+    const base64 = await toBase64(file);
+    const res = await fetch(apiUrl,{
+      method:'PUT',
+      headers:{'Authorization':`Bearer ${cfg.token}`,'Content-Type':'application/json','Accept':'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28'},
+      body:JSON.stringify({message:`Upload ${fname} via SEAS Question Builder`,content:base64})
+    });
+    if (!res.ok) { const e=await res.json().catch(()=>({})); showStatus('error',`Upload failed (${res.status}): ${e.message||res.statusText}`); return null; }
+    const data = await res.json();
+    showStatus('success',`"${file.name}" uploaded successfully!`);
+    return data.content.download_url;
+  } catch(e) { showStatus('error',`Network error: ${e.message}`); return null; }
 }
-
-function generateTable(){
- let r=document.getElementById('rows').value;
- let c=document.getElementById('cols').value;
- let t='<table border="1" style="border-collapse:collapse;width:100%">';
- for(let i=0;i<r;i++){
- t+='<tr>';
- for(let j=0;j<c;j++){
- t+='<td style="padding:6px">&nbsp;</td>';
- }
- t+='</tr>';
- }
- t+='</table>';
- tableHTML=t;
+function toBase64(file) {
+  return new Promise((res,rej) => { const r=new FileReader(); r.onload=()=>res(r.result.split(',')[1]); r.onerror=rej; r.readAsDataURL(file); });
 }
-
+function showStatus(type,msg) {
+  const el=document.getElementById('uploadStatus'); el.className=`upload-status ${type}`; el.classList.remove('hidden');
+  const icons={uploading:`<div class="spinner"></div>`,success:`<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" fill="#eaf5ee" stroke="#a8d8bc" stroke-width="1.2"/><path d="M5 8l2.5 2.5L11 6" stroke="#1a7a4a" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`,error:`<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" fill="#fef2f2" stroke="#fca5a5" stroke-width="1.2"/><path d="M6 6l4 4M10 6l-4 4" stroke="#b91c1c" stroke-width="1.5" stroke-linecap="round"/></svg>`};
+  el.innerHTML=`${icons[type]||''}<span>${msg}</span>`;
+}
+const dropZone=document.getElementById('dropZone'), fileInput=document.getElementById('fileInput');
+dropZone.addEventListener('dragover',e=>{e.preventDefault();dropZone.classList.add('dragover');});
+dropZone.addEventListener('dragleave',()=>dropZone.classList.remove('dragover'));
+dropZone.addEventListener('drop',e=>{e.preventDefault();dropZone.classList.remove('dragover');const f=e.dataTransfer.files[0];if(f&&f.type.startsWith('image/'))handleFile(f);else if(f)showStatus('error','Please drop an image file.');});
+fileInput.addEventListener('change',()=>{if(fileInput.files[0])handleFile(fileInput.files[0]);});
+async function handleFile(file) {
+  const localUrl=URL.createObjectURL(file);
+  const thumb=document.getElementById('thumbPreview'); thumb.innerHTML=`<img src="${localUrl}" alt="preview" />`; thumb.classList.remove('hidden');
+  const rawUrl=await uploadToGitHub(file);
+  if(rawUrl){
+    document.getElementById('imgurl').value=rawUrl;
+    if(!document.getElementById('imgalt').value.trim()) document.getElementById('imgalt').value=file.name.replace(/\.[^.]+$/,'').replace(/[_-]+/g,' ');
+    addUploadedChip(file.name,rawUrl); update();
+  }
+}
+function addUploadedChip(name,url) {
+  const c=document.getElementById('uploadedFiles'),item=document.createElement('div');
+  item.className='uploaded-file-item'; item.title='Click to use this image';
+  item.innerHTML=`<svg width="13" height="13" viewBox="0 0 13 13" fill="none"><rect x="0.5" y="0.5" width="12" height="12" rx="2" stroke="currentColor" stroke-width="1.1"/><circle cx="4.5" cy="4.5" r="1.2" fill="currentColor"/><path d="M1 10l3-3 2.5 2.5L9 7l3.5 3.5" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="fname">${name}</span><svg width="11" height="11" viewBox="0 0 11 11" fill="none"><path d="M2 5.5h7M6.5 3l2.5 2.5L6.5 8" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+  item.addEventListener('click',()=>{document.getElementById('imgurl').value=url;update();});
+  c.prepend(item);
+}
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function getWidth(){const v=document.getElementById('imgwidth').value;return v==='custom'?(document.getElementById('customWidth').value.trim()||'400px'):v;}
+function buildHTML(){
+  const qtext=document.getElementById('qtext').value.trim(),imgurl=document.getElementById('imgurl').value.trim(),imgalt=document.getElementById('imgalt').value.trim()||'Question image',align=document.getElementById('imgalign').value,border=document.getElementById('imgborder').value,width=getWidth(),extra=document.getElementById('extratext').value.trim();
+  let html='';
+  if(qtext)qtext.split('\n').forEach(l=>{if(l.trim())html+=`<p>${esc(l)}</p>\n`;});
+  if(imgurl){let is=`max-width: ${width}; height: auto; display: block;`;if(border!=='none')is+=` border: ${border};`;let ws='margin: 12px 0;';if(align==='center'){ws+=' text-align: center;';is+=' margin-left: auto; margin-right: auto;';}else if(align==='right'){ws+=' text-align: right;';is+=' margin-left: auto;';}html+=`<div style="${ws}">\n  <img src="${esc(imgurl)}" alt="${esc(imgalt)}" style="${is}" />\n</div>\n`;}
+  if(extra)extra.split('\n').forEach(l=>{if(l.trim())html+=`<p style="font-size: 0.9em; color: #555555; margin-top: 4px;">${esc(l)}</p>\n`;});
+  return html.trim();
+}
 function update(){
- let q=document.getElementById('qtext').value;
- let html='';
-
- if(q) html+=`<p>${q}</p>`;
-
- images.forEach(img=>{
- html+=`<div style="text-align:center;margin:10px 0">
-<img src="${img}" style="max-width:400px;height:auto;display:block;margin:auto" />
-</div>`;
- });
-
- if(tableHTML) html+=tableHTML;
-
- document.getElementById('preview').innerHTML=html;
- document.getElementById('output').value=html;
+  const html=buildHTML(),preview=document.getElementById('preview'),codebox=document.getElementById('codebox'),emptyNotice=document.getElementById('emptyNotice'),codeWrap=document.getElementById('codeWrap');
+  if(!html){preview.innerHTML='<span class="empty-state">Fill in the fields to see a preview here.</span>';emptyNotice.classList.remove('hidden');codeWrap.classList.add('hidden');return;}
+  emptyNotice.classList.add('hidden');codeWrap.classList.remove('hidden');codebox.textContent=html;
+  const qtext=document.getElementById('qtext').value.trim(),imgurl=document.getElementById('imgurl').value.trim(),imgalt=document.getElementById('imgalt').value.trim()||'Question image',align=document.getElementById('imgalign').value,border=document.getElementById('imgborder').value,width=getWidth(),extra=document.getElementById('extratext').value.trim();
+  let pv='';
+  if(qtext)qtext.split('\n').forEach(l=>{if(l.trim())pv+=`<p style="margin-bottom:6px;">${l}</p>`;});
+  if(imgurl){let is=`max-width:${width}; height:auto; display:block;`;if(border!=='none')is+=` border:${border};`;let cls='img-left';if(align==='center'){cls='img-center';is+=' margin-left:auto; margin-right:auto;';}else if(align==='right'){cls='img-right';is+=' margin-left:auto;';}pv+=`<div class="${cls}"><img src="${imgurl}" alt="${imgalt}" style="${is}" /></div>`;}
+  if(extra)extra.split('\n').forEach(l=>{if(l.trim())pv+=`<p style="font-size:0.9em;color:#666;margin-top:4px;">${l}</p>`;});
+  preview.innerHTML=pv;
 }
-
 function copyCode(){
- let t=document.getElementById('output');
- t.select();
- document.execCommand('copy');
+  const code=document.getElementById('codebox').textContent; if(!code)return;
+  const btn=document.getElementById('copybtn');
+  const ok=()=>{btn.classList.replace('btn-primary','btn-success');btn.innerHTML=`<svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M2 6.5l3.5 3.5 5.5-6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg> Copied!`;setTimeout(()=>{btn.classList.replace('btn-success','btn-primary');btn.innerHTML=`<svg width="13" height="13" viewBox="0 0 13 13" fill="none"><rect x="3.5" y="0.5" width="9" height="9" rx="1.5" stroke="white" stroke-width="1.2"/><rect x="0.5" y="3.5" width="9" height="9" rx="1.5" fill="#1a4fd8" stroke="white" stroke-width="1.2"/></svg> Copy HTML`;},2500);};
+  navigator.clipboard.writeText(code).then(ok).catch(()=>{const ta=document.createElement('textarea');ta.value=code;ta.style.cssText='position:fixed;opacity:0;';document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);ok();});
 }
-</script>
+function resetAll(){
+  ['qtext','imgurl','imgalt','extratext'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('imgwidth').value='400px';document.getElementById('imgalign').value='center';document.getElementById('imgborder').value='none';document.getElementById('customWidth').value='';
+  document.getElementById('customWidthWrap').classList.add('hidden');document.getElementById('thumbPreview').classList.add('hidden');document.getElementById('uploadStatus').classList.add('hidden');document.getElementById('uploadedFiles').innerHTML='';update();
+}
+['qtext','imgurl','imgalt','extratext','customWidth'].forEach(id=>document.getElementById(id).addEventListener('input',update));
+['imgwidth','imgalign','imgborder'].forEach(id=>document.getElementById(id).addEventListener('change',update));
+document.getElementById('imgwidth').addEventListener('change',function(){document.getElementById('customWidthWrap').classList.toggle('hidden',this.value!=='custom');});
 
+/* ═══ TABLE / RUBRIC BUILDER ═══ */
+let tableData = [];
+let currentStyle = 'striped';
+
+function escH(s){return(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+function initTableData(rows,cols,prefill){
+  tableData=[];
+  for(let r=0;r<rows;r++){tableData[r]=[];for(let c=0;c<cols;c++)tableData[r][c]=(prefill&&prefill[r]&&prefill[r][c]!==undefined)?prefill[r][c]:'';}
+}
+
+function applyTemplate(name){
+  let rows,cols,data,style='striped';
+  if(name==='rubric4'){
+    rows=5;cols=5;style='rubric';
+    data=[
+      ['Criteria','Excellent (4)','Proficient (3)','Developing (2)','Beginning (1)'],
+      ['Content & Ideas','Exceptionally clear and detailed.','Mostly clear with minor gaps.','Somewhat clear; key ideas missing.','Unclear or missing.'],
+      ['Organisation','Logically structured throughout.','Generally organised.','Some structure present.','Little to no structure.'],
+      ['Language Use','Precise, varied vocabulary.','Mostly appropriate language.','Some errors; meaning clear.','Frequent errors; hard to follow.'],
+      ['Mechanics','No errors in spelling/grammar.','Few minor errors.','Noticeable errors.','Many errors throughout.'],
+    ];
+    document.getElementById('hasFirstColHeader').checked=true;
+  }else if(name==='rubric3'){
+    rows=4;cols=4;style='rubric';
+    data=[
+      ['Criteria','Excellent (3)','Satisfactory (2)','Needs Improvement (1)'],
+      ['Criterion 1','','',''],
+      ['Criterion 2','','',''],
+      ['Criterion 3','','',''],
+    ];
+    document.getElementById('hasFirstColHeader').checked=true;
+  }else if(name==='checklist'){
+    rows=6;cols=3;style='striped';
+    data=[
+      ['Task / Indicator','Marks','Notes / Evidence'],
+      ['Item 1','',''],
+      ['Item 2','',''],
+      ['Item 3','',''],
+      ['Item 4','',''],
+      ['Total','',''],
+    ];
+    document.getElementById('hasFirstColHeader').checked=false;
+  }else{
+    rows=3;cols=3;style='striped';
+    data=[['Header 1','Header 2','Header 3'],['','',''],['','','']];
+    document.getElementById('hasFirstColHeader').checked=false;
+  }
+  document.getElementById('hasHeader').checked=true;
+  document.getElementById('tblRows').value=rows;
+  document.getElementById('tblCols').value=cols;
+  setStyle(style,document.querySelector(`.style-chip[data-style="${style}"]`));
+  initTableData(rows,cols,data);
+  renderEditor();
+  updateTableOutput();
+}
+
+function rebuildTable(){
+  const rows=parseInt(document.getElementById('tblRows').value)||3;
+  const cols=parseInt(document.getElementById('tblCols').value)||3;
+  const old=tableData;
+  initTableData(rows,cols,old);
+  renderEditor();
+  updateTableOutput();
+}
+
+function setStyle(style,btn){
+  currentStyle=style;
+  document.querySelectorAll('.style-chip').forEach(c=>c.classList.remove('active'));
+  if(btn)btn.classList.add('active');
+  updateTableOutput();
+}
+
+function renderEditor(){
+  const rows=tableData.length;
+  const cols=tableData[0]?tableData[0].length:0;
+  const hasHeader=document.getElementById('hasHeader').checked;
+  const hasFC=document.getElementById('hasFirstColHeader').checked;
+
+  let h=`<table class="rubric-grid">`;
+
+  // Top control row
+  h+=`<tr><td class="col-ctrl-cell" style="width:28px;"></td>`;
+  for(let c=0;c<cols;c++) h+=`<td class="col-ctrl-cell"><button class="ctrl-btn del" title="Remove column" onclick="removeCol(${c})">×</button></td>`;
+  h+=`<td class="col-ctrl-cell"><button class="ctrl-btn add" title="Add column" onclick="addCol()">+</button></td></tr>`;
+
+  for(let r=0;r<rows;r++){
+    h+=`<tr>`;
+    h+=`<td class="row-ctrl-cell"><button class="ctrl-btn del" title="Remove row" onclick="removeRow(${r})">×</button></td>`;
+    for(let c=0;c<cols;c++){
+      const isH=(hasHeader&&r===0)||(hasFC&&c===0);
+      const tag=isH?'th':'td';
+      const val=(tableData[r]&&tableData[r][c]!==undefined)?tableData[r][c]:'';
+      h+=`<${tag}><textarea class="cell-input" data-r="${r}" data-c="${c}" oninput="onCellInput(this)" placeholder="${isH?'Header':'Cell'}">${escH(val)}</textarea></${tag}>`;
+    }
+    h+=`<td class="col-ctrl-cell"></td></tr>`;
+  }
+
+  // Bottom add-row row
+  h+=`<tr><td class="col-ctrl-cell"><button class="ctrl-btn add" title="Add row" onclick="addRow()">+</button></td>`;
+  for(let c=0;c<=cols;c++) h+=`<td class="col-ctrl-cell"></td>`;
+  h+=`</tr></table>`;
+
+  document.getElementById('tableEditorWrap').innerHTML=h;
+}
+
+function onCellInput(el){
+  const r=parseInt(el.dataset.r),c=parseInt(el.dataset.c);
+  if(!tableData[r])tableData[r]=[];
+  tableData[r][c]=el.value;
+  updateTableOutput();
+}
+function addRow(){const cols=tableData[0]?tableData[0].length:3;tableData.push(new Array(cols).fill(''));document.getElementById('tblRows').value=tableData.length;renderEditor();updateTableOutput();}
+function removeRow(r){if(tableData.length<=1)return;tableData.splice(r,1);document.getElementById('tblRows').value=tableData.length;renderEditor();updateTableOutput();}
+function addCol(){tableData.forEach(row=>row.push(''));document.getElementById('tblCols').value=tableData[0].length;renderEditor();updateTableOutput();}
+function removeCol(c){if(tableData[0]&&tableData[0].length<=1)return;tableData.forEach(row=>row.splice(c,1));document.getElementById('tblCols').value=tableData[0].length;renderEditor();updateTableOutput();}
+
+function buildTableHTML(){
+  const hasHeader=document.getElementById('hasHeader').checked;
+  const hasFC=document.getElementById('hasFirstColHeader').checked;
+  const s=currentStyle;
+  const styles={
+    striped:{table:'border-collapse:collapse;width:100%;font-family:Arial,sans-serif;font-size:14px;',th:'background:#1a4fd8;color:#ffffff;padding:8px 12px;border:1px solid #1a4fd8;text-align:left;',td:'padding:8px 12px;border:1px solid #cccccc;',tdAlt:'padding:8px 12px;border:1px solid #cccccc;background:#f7f7f5;'},
+    rubric:{table:'border-collapse:collapse;width:100%;font-family:Arial,sans-serif;font-size:14px;',th:'background:#1a4fd8;color:#ffffff;padding:8px 12px;border:1px solid #1a4fd8;text-align:center;',thCorner:'background:#0f2d82;color:#ffffff;padding:8px 12px;border:1px solid #0f2d82;text-align:left;',thRow:'background:#eef2fd;padding:8px 12px;border:1px solid #b4c4f0;font-weight:600;',td:'padding:8px 12px;border:1px solid #cccccc;vertical-align:top;'},
+    minimal:{table:'border-collapse:collapse;width:100%;font-family:Arial,sans-serif;font-size:14px;',th:'padding:8px 12px;border-bottom:2px solid #1a4fd8;text-align:left;font-weight:600;',td:'padding:8px 12px;border-bottom:1px solid #dddddd;'},
+    bordered:{table:'border-collapse:collapse;width:100%;font-family:Arial,sans-serif;font-size:14px;',th:'background:#333333;color:#ffffff;padding:8px 12px;border:2px solid #333333;',td:'padding:8px 12px;border:2px solid #333333;'},
+    plain:{table:'border-collapse:collapse;width:100%;font-family:Arial,sans-serif;font-size:14px;',th:'background:#f5f5f5;padding:8px 12px;border:1px solid #cccccc;font-weight:600;',td:'padding:8px 12px;border:1px solid #cccccc;'}
+  };
+  const st=styles[s]||styles.plain;
+  let html=`<table style="${st.table}">\n`;
+  tableData.forEach((row,r)=>{
+    html+=`  <tr>\n`;
+    row.forEach((cell,c)=>{
+      const isRowH=hasHeader&&r===0;
+      const isColH=hasFC&&c===0;
+      const isH=isRowH||isColH;
+      const tag=isH?'th':'td';
+      let cs='';
+      if(isH){
+        if(s==='rubric'&&isRowH&&c===0&&hasFC) cs=st.thCorner||st.th;
+        else if(s==='rubric'&&isColH&&!isRowH) cs=st.thRow||st.td;
+        else cs=st.th;
+      }else{
+        const isAlt=(s==='striped')&&r%2===0;
+        cs=(isAlt&&st.tdAlt)?st.tdAlt:st.td;
+      }
+      html+=`    <${tag} style="${cs}">${esc(cell||'')}</${tag}>\n`;
+    });
+    html+=`  </tr>\n`;
+  });
+  html+=`</table>`;
+  return html;
+}
+
+function updateTableOutput(){
+  const hasHeader=document.getElementById('hasHeader').checked;
+  const hasFC=document.getElementById('hasFirstColHeader').checked;
+  // Preview
+  const wrap=document.getElementById('tblPreviewWrap');
+  wrap.className=`tbl-preview-wrap style-${currentStyle}`;
+  let pv='<table>';
+  tableData.forEach((row,r)=>{
+    pv+='<tr>';
+    row.forEach((cell,c)=>{
+      const isH=(hasHeader&&r===0)||(hasFC&&c===0);
+      const tag=isH?'th':'td';
+      pv+=`<${tag}>${escH(cell)}</${tag}>`;
+    });
+    pv+='</tr>';
+  });
+  pv+='</table>';
+  wrap.innerHTML=pv;
+  // Code
+  document.getElementById('tblCodebox').textContent=buildTableHTML();
+}
+
+function copyTableCode(){
+  const code=document.getElementById('tblCodebox').textContent; if(!code)return;
+  const btn=document.getElementById('tblCopybtn');
+  const ok=()=>{btn.classList.replace('btn-primary','btn-success');btn.innerHTML=`<svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M2 6.5l3.5 3.5 5.5-6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg> Copied!`;setTimeout(()=>{btn.classList.replace('btn-success','btn-primary');btn.innerHTML=`<svg width="13" height="13" viewBox="0 0 13 13" fill="none"><rect x="3.5" y="0.5" width="9" height="9" rx="1.5" stroke="white" stroke-width="1.2"/><rect x="0.5" y="3.5" width="9" height="9" rx="1.5" fill="#1a4fd8" stroke="white" stroke-width="1.2"/></svg> Copy HTML`;},2500);};
+  navigator.clipboard.writeText(code).then(ok).catch(()=>{const ta=document.createElement('textarea');ta.value=code;ta.style.cssText='position:fixed;opacity:0;';document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);ok();});
+}
+
+// Init
+applyTemplate('rubric4');
+</script>
 </body>
 </html>
